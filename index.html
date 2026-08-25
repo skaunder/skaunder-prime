@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skaunder Prime - Painel de Trading ASG & Fluxo</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --text-color: #c9d1d9;
+            --buy-color: #238636;
+            --sell-color: #da3633;
+            --accent-color: #58a6ff;
+            --warning-color: #d29922;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            background-color: var(--warning-color);
+            color: #000;
+        }
+
+        .status-badge.connected {
+            background-color: var(--buy-color);
+            color: #fff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 350px;
+            background-color: #010409;
+            border-radius: 4px;
+        }
+
+        .tape-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 350px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+
+        .tape-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        .tape-item.buy {
+            color: #3fb950;
+            background-color: rgba(35, 134, 54, 0.1);
+        }
+
+        .tape-item.sell {
+            color: #f85149;
+            background-color: rgba(218, 54, 51, 0.1);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .metric-box {
+            background-color: #21262d;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .metric-box .val {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background-color: #21262d;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #30363d;
+        }
+
+        button.btn-buy {
+            background-color: var(--buy-color);
+            color: #fff;
+            border: none;
+        }
+
+        button.btn-sell {
+            background-color: var(--sell-color);
+            color: #fff;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Skaunder Prime | ASG & Institutional Flow</h1>
+        <div id="statusBadge" class="status-badge">Desconectado</div>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Canvas Chart - Fluxo Consolidado (B3)</h2>
+            <canvas id="flowChart"></canvas>
+            <div class="metrics">
+                <div class="metric-box">
+                    <div>Delta de Agressão</div>
+                    <div id="deltaVal" class="val">0</div>
+                </div>
+                <div class="metric-box">
+                    <div>Volume Compra</div>
+                    <div id="volBuyVal" class="val" style="color: #3fb950;">0</div>
+                </div>
+                <div class="metric-box">
+                    <div>Volume Venda</div>
+                    <div id="volSellVal" class="val" style="color: #f85149;">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Tape Reading / Absorções em Tempo Real</h2>
+            <ul id="tapeList" class="tape-list">
+                <li class="tape-item">Aguardando dados de ticks...</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+        <h2>Controle Operacional & Voice Alerts</h2>
+        <div class="controls">
+            <button id="toggleAudioBtn">🔊 Ativar Alertas de Voz</button>
+            <button class="btn-buy" onclick="sendSignal('BUY')">Testar Compra ASG</button>
+            <button class="btn-sell" onclick="sendSignal('SELL')">Testar Venda ASG</button>
+        </div>
+    </div>
+
+    <script>
+        const wsUrl = "ws://" + (window.location.hostname || "localhost") + ":8080";
+        let ws;
+        let audioEnabled = false;
+
+        const statusBadge = document.getElementById('statusBadge');
+        const tapeList = document.getElementById('tapeList');
+        const canvas = document.getElementById('flowChart');
+        const ctx = canvas.getContext('2d');
+
+        function initCanvas() {
+            canvas.width = canvas.parentElement.clientWidth - 30;
+            canvas.height = 350;
+            drawGrid();
+        }
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#21262d';
+            ctx.lineWidth = 1;
+            for(let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for(let j = 0; j < canvas.height; j += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, j);
+                ctx.lineTo(canvas.width, j);
+                ctx.stroke();
+            }
+        }
+
+        function speak(text) {
+            if (!audioEnabled || !('speechSynthesis' in window)) return;
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'pt-BR';
+            window.speechSynthesis.speak(msg);
+        }
+
+        document.getElementById('toggleAudioBtn').addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('toggleAudioBtn');
+            btn.innerText = audioEnabled ? "🔊 Alertas de Voz Ativos" : "🔇 Ativar Alertas de Voz";
+            if(audioEnabled) speak("Sistema Skaunder Prime pronto");
+        });
+
+        function connectWS() {
+            ws = new WebSocket(wsUrl);
+            ws.onopen = () => {
+                statusBadge.innerText = "Conectado ao Gateway";
+                statusBadge.classList.add('connected');
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'tick') {
+                    addTapeRow(data);
+                } else if (data.type === 'alert') {
+                    speak(data.message);
+                }
+            };
+
+            ws.onclose = () => {
+                statusBadge.innerText = "Reconectando...";
+                statusBadge.classList.remove('connected');
+                setTimeout(connectWS, 3000);
+            };
+        }
+
+        function addTapeRow(data) {
+            const li = document.createElement('li');
+            li.className = `tape-item ${data.side.toLowerCase()}`;
+            li.innerHTML = `<span>${data.time}</span> <span>${data.side}</span> <span>${data.price}</span> <span>Vol: ${data.volume}</span>`;
+            if (tapeList.children.length > 20) tapeList.removeChild(tapeList.lastChild);
+            tapeList.insertBefore(li, tapeList.firstChild);
+
+            if (data.volume >= 500) {
+                speak(`Absorção de ${data.side === 'BUY' ? 'compra' : 'venda'} em ${data.price}`);
+            }
+        }
+
+        function sendSignal(type) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'ORDER_SIGNAL', side: type, timestamp: Date.now() }));
+            }
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        connectWS();
+    </script>
+</body>
+</html>

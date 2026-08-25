@@ -1,0 +1,23 @@
+{
+  "name": "skaunder-prime-gateway",
+  "version": "1.0.0",
+  "description": "Gateway WebSocket de Baixa Latência e Painel ASG para o Robô Skaunder Prime (B3)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "trading",
+    "b3",
+    "metatrader5",
+    "asg",
+    "tape-reading",
+    "websocket"
+  ],
+  "author": "Skaunder Prime Team",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
