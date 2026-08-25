@@ -1,308 +1,550 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime - Painel de Trading ASG & Fluxo</title>
+    <title>Skaunder Prime | Pregão B3</title>
     <style>
         :root {
-            --bg-color: #0d1117;
-            --panel-bg: #161b22;
-            --border-color: #30363d;
-            --text-color: #c9d1d9;
-            --buy-color: #238636;
-            --sell-color: #da3633;
-            --accent-color: #58a6ff;
-            --warning-color: #d29922;
+            --bg-dark: #0b0e14;
+            --card-bg: #161b22;
+            --border-color: #21262d;
+            --text-main: #e1e6ed;
+            --text-muted: #8b949e;
+            --green: #00e676;
+            --green-glow: rgba(0, 230, 118, 0.2);
+            --red: #ff5252;
+            --red-glow: rgba(255, 82, 82, 0.2);
+            --blue: #29b6f6;
+            --yellow: #ffd600;
+            --orange: #ff9100;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 14px;
+            font-size: 13px;
         }
 
-        header {
+        /* HEADER */
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 18px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: var(--accent-color);
+        .brand h1 { font-size: 18px; letter-spacing: 1px; color: #fff; font-weight: 800; }
+        .brand-sub { font-size: 11px; color: var(--yellow); font-weight: bold; display: flex; align-items: center; gap: 4px; }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            background-color: var(--warning-color);
-            color: #000;
-        }
-
-        .status-badge.connected {
-            background-color: var(--buy-color);
+        .mode-select {
+            background: #1c2128;
             color: #fff;
+            border: 1px solid var(--yellow);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
-        .grid {
+        .date-picker {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            color: var(--blue);
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            color-scheme: dark;
+        }
+
+        .badge-live {
+            background: rgba(255, 82, 82, 0.2);
+            border: 1px solid var(--red);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--red);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .time-display {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--yellow);
+            letter-spacing: 1px;
+            background: #0d1117;
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-ctrl {
+            background: var(--orange);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .btn-ctrl-secondary {
+            background: #21262d;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .asset-select {
+            background: #0d1117;
+            color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* GRID */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 900px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
+            grid-template-columns: 360px 1fr;
+            gap: 14px;
         }
 
         .card {
-            background-color: var(--panel-bg);
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 15px;
+            padding: 14px;
+            margin-bottom: 14px;
         }
 
-        .card h2 {
-            margin-top: 0;
-            font-size: 1.1rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
+        .card-title {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+            font-weight: bold;
         }
 
-        canvas {
-            width: 100%;
-            height: 350px;
-            background-color: #010409;
-            border-radius: 4px;
+        /* PLACAR ESTATÍSTICO */
+        .score-box { text-align: center; padding: 4px 0; }
+        .score-val { font-size: 42px; font-weight: 800; color: var(--yellow); }
+        .score-max { font-size: 16px; color: var(--text-muted); }
+        .score-status { margin-top: 4px; font-weight: bold; font-size: 12px; color: var(--yellow); }
+
+        /* MICRO CONTEXTO */
+        .delta-bar-container {
+            background: #0d1117;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
         }
 
-        .tape-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            max-height: 350px;
-            overflow-y: auto;
-            font-family: monospace;
+        .delta-bar-fill {
+            height: 100%;
+            width: 54%;
+            background: linear-gradient(90deg, #ff5252 0%, #00e676 100%);
+            transition: width 0.2s linear;
         }
 
-        .tape-item {
+        .delta-stats { display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; }
+
+        /* PLAYERS */
+        .player-row {
             display: flex;
             justify-content: space-between;
-            padding: 6px 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #21262d;
+            font-size: 12px;
         }
+        .player-val-buy { color: var(--green); font-weight: bold; }
+        .player-val-sell { color: var(--red); font-weight: bold; }
 
-        .tape-item.buy {
-            color: #3fb950;
-            background-color: rgba(35, 134, 54, 0.1);
-        }
-
-        .tape-item.sell {
-            color: #f85149;
-            background-color: rgba(218, 54, 51, 0.1);
-        }
-
-        .metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .metric-box {
-            background-color: #21262d;
+        .verdict-box {
+            margin-top: 12px;
             padding: 10px;
             border-radius: 6px;
+            background: rgba(255, 214, 0, 0.1);
+            border: 1px solid var(--yellow);
+            color: var(--yellow);
+            font-weight: bold;
             text-align: center;
+            font-size: 11px;
         }
 
-        .metric-box .val {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-top: 5px;
-        }
+        /* BOLETAGEM */
+        .trade-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+        .btn-buy-act { background: rgba(0, 230, 118, 0.15); color: var(--green); border: 1px solid var(--green); padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-buy-act:hover { background: var(--green); color: #000; }
+        .btn-sell-act { background: rgba(255, 82, 82, 0.15); color: var(--red); border: 1px solid var(--red); padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-sell-act:hover { background: var(--red); color: #fff; }
 
-        .controls {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            background-color: #21262d;
-            color: var(--text-color);
+        /* CHARTS & GATILHO */
+        .chart-card {
+            background: #0d1117;
             border: 1px solid var(--border-color);
-            padding: 10px 16px;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .chart-title { font-size: 13px; font-weight: bold; color: #fff; display: flex; gap: 8px; align-items: center; }
+        .chart-badge { background: rgba(41, 182, 246, 0.2); color: var(--blue); padding: 3px 6px; border-radius: 4px; font-size: 10px; }
+
+        canvas#candleChart {
+            width: 100%;
+            height: 250px;
+            display: block;
+            background: #080b10;
             border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
+            border: 1px solid var(--border-color);
         }
 
-        button:hover {
-            background-color: #30363d;
+        .trigger-box {
+            background: rgba(0, 230, 118, 0.1);
+            border: 1.5px solid var(--green);
+            box-shadow: 0 0 10px var(--green-glow);
+            padding: 14px 18px;
+            border-radius: 8px;
+            color: var(--green);
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        button.btn-buy {
-            background-color: var(--buy-color);
-            color: #fff;
-            border: none;
+        /* TIMES & TRADES */
+        .tt-stream {
+            height: 160px;
+            overflow-y: auto;
+            background: #080b10;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px;
+            font-size: 11px;
         }
 
-        button.btn-sell {
-            background-color: var(--sell-color);
-            color: #fff;
-            border: none;
-        }
+        .tt-row { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #161b22; }
+        .tt-buy { color: var(--green); font-weight: bold; }
+        .tt-sell { color: var(--red); font-weight: bold; }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Skaunder Prime | ASG & Institutional Flow</h1>
-        <div id="statusBadge" class="status-badge">Desconectado</div>
-    </header>
 
-    <div class="grid">
-        <div class="card">
-            <h2>Canvas Chart - Fluxo Consolidado (B3)</h2>
-            <canvas id="flowChart"></canvas>
-            <div class="metrics">
-                <div class="metric-box">
-                    <div>Delta de Agressão</div>
-                    <div id="deltaVal" class="val">0</div>
+    <div class="header">
+        <div class="brand">
+            <h1>SKAUNDER PRIME</h1>
+            <div id="brandSub" class="brand-sub">🟨 REPLAY DE PREGÃO</div>
+        </div>
+
+        <div class="header-controls">
+            <!-- SELETOR DE MODO -->
+            <select id="modeSelect" class="mode-select" onchange="trocarModo()">
+                <option value="replay">🟨 Replay de Pregão</option>
+                <option value="live">🔴 Pregão AO VIVO (Live)</option>
+            </select>
+
+            <!-- CONTROLES REPLAY -->
+            <div id="replayControls" style="display: flex; align-items: center; gap: 8px;">
+                <input type="date" id="replayDate" class="date-picker" value="2026-08-12" onchange="alterarDataReplay()">
+                <button class="btn-ctrl" id="btnPause" onclick="togglePause()">⏸ PAUSE</button>
+                <button class="btn-ctrl-secondary" onclick="resetReplay()">🔄 RESET</button>
+                <select class="btn-ctrl-secondary">
+                    <option>1x (Normal)</option>
+                    <option>2x</option>
+                    <option>5x</option>
+                </select>
+            </div>
+
+            <!-- STATUS LIVE -->
+            <div id="liveControls" style="display: none; align-items: center; gap: 8px;">
+                <span class="badge-live">🔴 MERCADO REAL B3</span>
+            </div>
+
+            <span class="time-display" id="clockDisplay">10:02:20</span>
+        </div>
+
+        <div>
+            <select id="assetSelect" class="asset-select" onchange="trocarAtivoInstantaneo()">
+                <option value="WDO" id="optWDO">WDOU26 (Mini Dólar)</option>
+                <option value="WIN" id="optWIN">WINQ26 (Mini Índice)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- COLUNA ESQUERDA -->
+        <div>
+            <div class="card">
+                <div class="card-title">PLACAR ESTATÍSTICO SKAUNDER</div>
+                <div class="score-box">
+                    <span id="scoreVal" class="score-val">3.4</span><span class="score-max"> / 5.0</span>
+                    <div id="scoreStatus" class="score-status">⚖️ MERCADO EM CONSOLIDAÇÃO</div>
                 </div>
-                <div class="metric-box">
-                    <div>Volume Compra</div>
-                    <div id="volBuyVal" class="val" style="color: #3fb950;">0</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">MICRO CONTEXTO - AGRESSÃO INSTANTÂNEA</div>
+                <div class="delta-bar-container">
+                    <div id="deltaBar" class="delta-bar-fill"></div>
                 </div>
-                <div class="metric-box">
-                    <div>Volume Venda</div>
-                    <div id="volSellVal" class="val" style="color: #f85149;">0</div>
+                <div class="delta-stats">
+                    <span id="buyRatioLabel">BUY 54% / SELL 46%</span>
+                    <span id="deltaVal" style="color: var(--red);">Delta: -103</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">FLUXO ACUMULADO DE PLAYERS</div>
+                <div class="player-row">
+                    <span>Estrangeiros (HFT)</span>
+                    <span id="valEstrangeiros" class="player-val-buy">+R$ 41.5M <small style="color: var(--green);">(COMPRA)</small></span>
+                </div>
+                <div class="player-row">
+                    <span>Institucionais Domésticos</span>
+                    <span id="valInstitucional" class="player-val-buy">+R$ 3.2M <small style="color: var(--green);">(DEFESA)</small></span>
+                </div>
+                <div class="player-row">
+                    <span>Varejo / CPF</span>
+                    <span id="valVarejo" class="player-val-sell">-R$ 44.7M <small style="color: var(--red);">(VENDA)</small></span>
+                </div>
+                <div id="veredictoBox" class="verdict-box">
+                    🟡 ACUMULAÇÃO DE LOTE / AGUARDAR GATILHO
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">SIMULADOR DE BOLETAGEM</div>
+                <div class="trade-controls">
+                    <button class="btn-buy-act" onclick="executarOrdemSimulada('COMPRA')">🟢 COMPRAR</button>
+                    <button class="btn-sell-act" onclick="executarOrdemSimulada('VENDA')">🔴 VENDER</button>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <h2>Tape Reading / Absorções em Tempo Real</h2>
-            <ul id="tapeList" class="tape-list">
-                <li class="tape-item">Aguardando dados de ticks...</li>
-            </ul>
-        </div>
-    </div>
+        <!-- COLUNA DIREITA -->
+        <div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span id="chartSymbol">WDOU26</span>
+                        <span id="chartBadge" class="chart-badge">1 MINUTO (REPLAY TICK)</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted);">
+                        PREÇO ATUAL: <b id="chartLastPrice" style="color: #fff;">5611.12</b>
+                    </div>
+                </div>
+                <canvas id="candleChart" width="800" height="250"></canvas>
+            </div>
 
-    <div class="card" style="margin-top: 20px;">
-        <h2>Controle Operacional & Voice Alerts</h2>
-        <div class="controls">
-            <button id="toggleAudioBtn">🔊 Ativar Alertas de Voz</button>
-            <button class="btn-buy" onclick="sendSignal('BUY')">Testar Compra ASG</button>
-            <button class="btn-sell" onclick="sendSignal('SELL')">Testar Venda ASG</button>
+            <div id="triggerBox" class="trigger-box">
+                ⚡ <span id="triggerMsg">GATILHO EXATO DE COMPRA ATIVO - WDOU26 @ 5610.12</span>
+            </div>
+
+            <div class="card" style="margin-bottom: 0;">
+                <div class="card-title" id="ttTitle">TIMES & TRADES - AGRESSÕES WDOU26</div>
+                <div id="ttStream" class="tt-stream">
+                    <div class="tt-row"><span><b>Goldman Sachs</b></span><span class="tt-buy">12 cont @ 5611.12 (COMPRA)</span></div>
+                    <div class="tt-row"><span><b>UBS</b></span><span class="tt-sell">56 cont @ 5610.62 (VENDA)</span></div>
+                    <div class="tt-row"><span><b>UBS</b></span><span class="tt-buy">30 cont @ 5611.12 (COMPRA)</span></div>
+                    <div class="tt-row"><span><b>XP</b></span><span class="tt-sell">80 cont @ 5610.62 (VENDA)</span></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const wsUrl = "ws://" + (window.location.hostname || "localhost") + ":8080";
-        let ws;
-        let audioEnabled = false;
+        let tipoAtivoAtual = "WDO";
+        let codigoContratoAtual = "WDOU26";
+        let precoBase = 5611.12;
+        let emPausa = false;
 
-        const statusBadge = document.getElementById('statusBadge');
-        const tapeList = document.getElementById('tapeList');
-        const canvas = document.getElementById('flowChart');
-        const ctx = canvas.getContext('2d');
+        function trocarModo() {
+            const modo = document.getElementById('modeSelect').value;
+            const replayControls = document.getElementById('replayControls');
+            const liveControls = document.getElementById('liveControls');
+            const brandSub = document.getElementById('brandSub');
+            const chartBadge = document.getElementById('chartBadge');
 
-        function initCanvas() {
-            canvas.width = canvas.parentElement.clientWidth - 30;
-            canvas.height = 350;
-            drawGrid();
-        }
-
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#21262d';
-            ctx.lineWidth = 1;
-            for(let i = 0; i < canvas.width; i += 40) {
-                ctx.beginPath();
-                ctx.moveTo(i, 0);
-                ctx.lineTo(i, canvas.height);
-                ctx.stroke();
+            if (modo === 'live') {
+                replayControls.style.display = 'none';
+                liveControls.style.display = 'flex';
+                brandSub.innerHTML = '🔴 PREGÃO AO VIVO';
+                brandSub.style.color = 'var(--red)';
+                chartBadge.innerText = '1 MINUTO (MERCADO REAL)';
+                chartBadge.style.background = 'rgba(255, 82, 82, 0.2)';
+                chartBadge.style.color = 'var(--red)';
+                iniciarRelogioLive();
+            } else {
+                replayControls.style.display = 'flex';
+                liveControls.style.display = 'none';
+                brandSub.innerHTML = '🟨 REPLAY DE PREGÃO';
+                brandSub.style.color = 'var(--yellow)';
+                chartBadge.innerText = '1 MINUTO (REPLAY TICK)';
+                chartBadge.style.background = 'rgba(41, 182, 246, 0.2)';
+                chartBadge.style.color = 'var(--blue)';
             }
-            for(let j = 0; j < canvas.height; j += 40) {
-                ctx.beginPath();
-                ctx.moveTo(0, j);
-                ctx.lineTo(canvas.width, j);
-                ctx.stroke();
+        }
+
+        function alterarDataReplay() {
+            const dataSelecionada = document.getElementById('replayDate').value;
+            const dataFormatada = dataSelecionada.split('-').reverse().join('/');
+            alert(`Carregando dados de Replay do dia: ${dataFormatada}`);
+        }
+
+        function togglePause() {
+            emPausa = !emPausa;
+            document.getElementById('btnPause').innerText = emPausa ? '▶ PLAY' : '⏸ PAUSE';
+        }
+
+        function resetReplay() {
+            alert('Replay reiniciado para o tempo 10:00:00');
+            document.getElementById('clockDisplay').innerText = '10:00:00';
+        }
+
+        function iniciarRelogioLive() {
+            const agora = new Date();
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+            const segundos = String(agora.getSeconds()).padStart(2, '0');
+            document.getElementById('clockDisplay').innerText = `${horas}:${minutos}:${segundos}`;
+        }
+
+        function obterContratoVigente(ativo) {
+            const hoje = new Date();
+            let ano = hoje.getFullYear();
+            let mes = hoje.getMonth();
+            const dia = hoje.getDate();
+            const letras = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z'];
+
+            if (ativo === 'WDO') {
+                let mesVenc = mes + 1;
+                if (mesVenc > 11) { mesVenc = 0; ano++; }
+                return `WDO${letras[mesVenc]}${ano.toString().slice(-2)}`;
+            }
+
+            if (ativo === 'WIN') {
+                const mesesPares = [1, 3, 5, 7, 9, 11];
+                let mesVenc = mesesPares.find(m => m > mes || (m === mes && dia <= 15));
+                if (mesVenc === undefined) { mesVenc = 1; ano++; }
+                return `WIN${letras[mesVenc]}${ano.toString().slice(-2)}`;
             }
         }
 
-        function speak(text) {
-            if (!audioEnabled || !('speechSynthesis' in window)) return;
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'pt-BR';
-            window.speechSynthesis.speak(msg);
+        function trocarAtivoInstantaneo() {
+            tipoAtivoAtual = document.getElementById('assetSelect').value;
+            codigoContratoAtual = obterContratoVigente(tipoAtivoAtual);
+            document.getElementById('chartSymbol').innerText = codigoContratoAtual;
+            document.getElementById('ttTitle').innerText = `TIMES & TRADES - AGRESSÕES ${codigoContratoAtual}`;
         }
 
-        document.getElementById('toggleAudioBtn').addEventListener('click', () => {
-            audioEnabled = !audioEnabled;
-            const btn = document.getElementById('toggleAudioBtn');
-            btn.innerText = audioEnabled ? "🔊 Alertas de Voz Ativos" : "🔇 Ativar Alertas de Voz";
-            if(audioEnabled) speak("Sistema Skaunder Prime pronto");
-        });
+        function executarOrdemSimulada(tipo) {
+            alert(`Ordem de ${tipo} enviada para ${codigoContratoAtual} no preço ${precoBase}`);
+        }
 
-        function connectWS() {
-            ws = new WebSocket(wsUrl);
-            ws.onopen = () => {
-                statusBadge.innerText = "Conectado ao Gateway";
-                statusBadge.classList.add('connected');
-            };
+        function desenharGraficoSimulado() {
+            const canvas = document.getElementById('candleChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
 
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'tick') {
-                    addTapeRow(data);
-                } else if (data.type === 'alert') {
-                    speak(data.message);
+            ctx.clearRect(0, 0, w, h);
+
+            const dummyCandles = [
+                { open: 5612, high: 5614, low: 5611, close: 5613 },
+                { open: 5613, high: 5613.5, low: 5610, close: 5611 },
+                { open: 5611, high: 5615, low: 5611, close: 5614 },
+                { open: 5614, high: 5617, low: 5614, close: 5616 },
+                { open: 5616, high: 5618, low: 5615, close: 5617 },
+                { open: 5617, high: 5617.5, low: 5613, close: 5614 },
+                { open: 5614, high: 5615, low: 5611, close: 5612 },
+                { open: 5612, high: 5613, low: 5609, close: 5610 },
+                { open: 5610, high: 5612, low: 5609.5, close: 5611.12 }
+            ];
+
+            const count = dummyCandles.length;
+            const candleWidth = (w - 60) / count;
+            const bodyWidth = candleWidth * 0.6;
+            const minP = 5608, maxP = 5620, range = maxP - minP;
+
+            dummyCandles.forEach((c, i) => {
+                const x = i * candleWidth + 30;
+                const isGreen = c.close >= c.open;
+                const color = isGreen ? '#00e676' : '#ff5252';
+
+                const yHigh = h - 20 - ((c.high - minP) / range) * (h - 40);
+                const yLow = h - 20 - ((c.low - minP) / range) * (h - 40);
+                const yOpen = h - 20 - ((c.open - minP) / range) * (h - 40);
+                const yClose = h - 20 - ((c.close - minP) / range) * (h - 40);
+
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(x + bodyWidth / 2, yHigh);
+                ctx.lineTo(x + bodyWidth / 2, yLow);
+                ctx.stroke();
+
+                ctx.fillStyle = color;
+                const bodyY = Math.min(yOpen, yClose);
+                const bodyH = Math.max(3, Math.abs(yOpen - yClose));
+                ctx.fillRect(x, bodyY, bodyWidth, bodyH);
+            });
+        }
+
+        window.onload = () => {
+            desenharGraficoSimulado();
+            setInterval(() => {
+                if (document.getElementById('modeSelect').value === 'live') {
+                    iniciarRelogioLive();
                 }
-            };
-
-            ws.onclose = () => {
-                statusBadge.innerText = "Reconectando...";
-                statusBadge.classList.remove('connected');
-                setTimeout(connectWS, 3000);
-            };
-        }
-
-        function addTapeRow(data) {
-            const li = document.createElement('li');
-            li.className = `tape-item ${data.side.toLowerCase()}`;
-            li.innerHTML = `<span>${data.time}</span> <span>${data.side}</span> <span>${data.price}</span> <span>Vol: ${data.volume}</span>`;
-            if (tapeList.children.length > 20) tapeList.removeChild(tapeList.lastChild);
-            tapeList.insertBefore(li, tapeList.firstChild);
-
-            if (data.volume >= 500) {
-                speak(`Absorção de ${data.side === 'BUY' ? 'compra' : 'venda'} em ${data.price}`);
-            }
-        }
-
-        function sendSignal(type) {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'ORDER_SIGNAL', side: type, timestamp: Date.now() }));
-            }
-        }
-
-        window.addEventListener('resize', initCanvas);
-        initCanvas();
-        connectWS();
+            }, 1000);
+        };
     </script>
 </body>
 </html>
