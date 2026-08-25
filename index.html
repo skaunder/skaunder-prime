@@ -546,5 +546,36 @@
             }, 1000);
         };
     </script>
+    <!-- Importa as bibliotecas do Firebase (Versão Compatível por CDN) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+    // Configuração básica do seu Firebase
+    const firebaseConfig = {
+        databaseURL: "https://seu-projeto-default-rtdb.firebaseio.com/" // Cole SUA URL aqui
+    };
+
+    // Inicializa o Firebase no Navegador
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // "Escuta" o nó 'cotacao' em tempo real
+    const cotacaoRef = database.ref('cotacao');
+    
+    cotacaoRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            console.log("Dados recebidos do MT5:", data);
+
+            // Atualiza os elementos na tela se estiver no modo LIVE
+            if (document.getElementById('modeSelect').value === 'live') {
+                document.getElementById('chartLastPrice').innerText = data.preco.toFixed(2);
+                document.getElementById('clockDisplay').innerText = data.hora;
+                document.getElementById('chartSymbol').innerText = data.ativo;
+            }
+        }
+    });
+</script>
 </body>
 </html>
