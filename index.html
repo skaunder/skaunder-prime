@@ -538,9 +538,9 @@
 
     <!-- INTEGRADOR MT5 -> FIREBASE -> PAINEL WEB -->
     <script>
-        // Configuração com a sua URL do Firebase Realtime Database
+        // Configuração com a URL base limpa do seu Firebase Realtime Database
         const firebaseConfig = {
-            databaseURL: "https://skaunder-prime-default-rtdb.firebaseio.com/" 
+            databaseURL: "https://skaunder-prime-default-rtdb.firebaseio.com"
         };
 
         // Inicializa o Firebase
@@ -554,7 +554,7 @@
             if (data) {
                 console.log("⚡ Dados do MT5 recebidos via Firebase:", data);
 
-                // Só atualiza a tela se o usuário estiver com a chave no modo LIVE
+                // Só atualiza a tela se o usuário estiver no modo LIVE
                 if (document.getElementById('modeSelect').value === 'live') {
                     
                     // 1. Preço Atual e Ativo
