@@ -295,11 +295,6 @@
                 <input type="date" id="replayDate" class="date-picker" value="2026-08-12" onchange="alterarDataReplay()">
                 <button class="btn-ctrl" id="btnPause" onclick="togglePause()">⏸ PAUSE</button>
                 <button class="btn-ctrl-secondary" onclick="resetReplay()">🔄 RESET</button>
-                <select class="btn-ctrl-secondary">
-                    <option>1x (Normal)</option>
-                    <option>2x</option>
-                    <option>5x</option>
-                </select>
             </div>
 
             <!-- STATUS LIVE -->
@@ -538,26 +533,18 @@
 
     <!-- INTEGRADOR MT5 -> FIREBASE -> PAINEL WEB -->
     <script>
-        // Configuração com a URL base limpa do seu Firebase Realtime Database
         const firebaseConfig = {
             databaseURL: "https://skaunder-prime-default-rtdb.firebaseio.com"
         };
 
-        // Inicializa o Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const cotacaoRef = database.ref('cotacao');
 
-        // Escuta novas cotações enviadas pelo MetaTrader 5
         cotacaoRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                console.log("⚡ Dados do MT5 recebidos via Firebase:", data);
-
-                // Só atualiza a tela se o usuário estiver no modo LIVE
                 if (document.getElementById('modeSelect').value === 'live') {
-                    
-                    // 1. Preço Atual e Ativo
                     if (data.preco !== undefined) {
                         const precoNum = Number(data.preco);
                         document.getElementById('chartLastPrice').innerText = precoNum.toFixed(2);
@@ -566,7 +553,6 @@
                     if (data.hora) document.getElementById('clockDisplay').innerText = data.hora;
                     if (data.ativo) document.getElementById('chartSymbol').innerText = data.ativo;
 
-                    // 2. Atualiza o Delta
                     if (data.delta !== undefined) {
                         const deltaVal = Number(data.delta);
                         const deltaEl = document.getElementById('deltaVal');
@@ -574,7 +560,6 @@
                         deltaEl.style.color = deltaVal >= 0 ? 'var(--green)' : 'var(--red)';
                     }
 
-                    // 3. Atualiza o Times & Trades em Tempo Real
                     if (data.agressao && data.volume) {
                         const stream = document.getElementById('ttStream');
                         const isBuy = data.agressao === 'COMPRA';
@@ -588,13 +573,11 @@
                         `;
                         stream.insertBefore(novaLinha, stream.firstChild);
                         
-                        // Mantém no máximo 15 linhas para não poluir
                         if (stream.children.length > 15) {
                             stream.removeChild(stream.lastChild);
                         }
                     }
 
-                    // 4. Atualiza o Gatilho
                     document.getElementById('triggerMsg').innerText = 
                         `GATILHO ATIVO (${data.agressao || 'FLOW'}) - ${data.ativo} @ ${Number(data.preco).toFixed(2)}`;
                 }
