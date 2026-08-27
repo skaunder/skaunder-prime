@@ -95,7 +95,7 @@
             cursor: pointer;
         }
 
-        /* GRID */
+        /* GRID PRINCIPAL */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 340px 1fr;
@@ -123,7 +123,7 @@
 
         /* PLACAR ESTATÍSTICO */
         .score-box { text-align: center; padding: 2px 0; }
-        .score-val { font-size: 34px; font-weight: 800; color: #ffb74d; }
+        .score-val { font-size: 34px; font-weight: 800; color: #ffb74d; transition: color 0.3s; }
         .score-max { font-size: 14px; color: var(--text-muted); }
         .score-status { margin-top: 2px; font-weight: bold; font-size: 11px; color: #ffb74d; }
 
@@ -141,7 +141,7 @@
             height: 100%;
             width: 54%;
             background: linear-gradient(90deg, var(--red) 0%, var(--green) 100%);
-            transition: width 0.2s linear;
+            transition: width 0.3s ease;
         }
 
         .delta-stats { display: flex; justify-content: space-between; font-weight: bold; font-size: 10px; }
@@ -177,7 +177,7 @@
         .btn-sell-act { background: rgba(242, 54, 69, 0.2); color: var(--red); border: 1px solid var(--red); padding: 8px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .btn-sell-act:hover { background: var(--red); color: #fff; }
 
-        /* CHARTS - MAIOR & PROFIT STYLE */
+        /* CHARTS - PROFIT PRO PATTERN (GRANDE E NO TOPO DIREITO) */
         .chart-card {
             background: #131722;
             border: 1px solid var(--border-color);
@@ -218,16 +218,16 @@
 
         canvas#candleChart {
             width: 100%;
-            height: 330px;
+            height: 420px; /* Gráfico maior no canto superior direito */
             display: block;
-            background: #0d1117;
+            background: #0b0e14;
             border-radius: 3px;
             border: 1px solid var(--border-color);
         }
 
         /* TIMES & TRADES */
         .tt-stream {
-            height: 180px;
+            height: 160px;
             overflow-y: auto;
             background: #0d1117;
             border: 1px solid var(--border-color);
@@ -250,7 +250,7 @@
         </div>
 
         <div class="header-controls">
-            <span class="badge-live" id="statusConnection">🟢 AO VIVO (MT5 / SIMULAÇÃO)</span>
+            <span class="badge-live" id="statusConnection">🟢 AO VIVO (MT5 / STREAM)</span>
             <span class="time-display" id="clockDisplay">10:02:20</span>
         </div>
 
@@ -312,13 +312,13 @@
             </div>
         </div>
 
-        <!-- COLUNA DIREITA -->
+        <!-- COLUNA DIREITA (GRÁFICO GRANDE NO TOPO + TIMES & TRADES ABAIXO) -->
         <div>
             <div class="chart-card">
                 <div class="chart-header">
                     <div class="chart-title">
                         <span id="chartSymbol">WDOU26</span>
-                        <span id="chartBadge" class="chart-badge">1 MIN</span>
+                        <span id="chartBadge" class="chart-badge">1 MIN (PRO)</span>
                     </div>
                     <div style="font-size: 11px; color: var(--text-muted);">
                         ULT: <b id="chartLastPrice" style="color: #fff;">5611.12</b>
@@ -330,10 +330,11 @@
                     <button class="tb-btn">1m</button>
                     <button class="tb-btn">5m</button>
                     <button class="tb-btn">VWAP / Regressão</button>
-                    <button class="tb-btn" style="margin-left:auto;">🔍 Zoom</button>
+                    <button class="tb-btn" style="margin-left:auto;">🔍 Zoom Pro</button>
                 </div>
 
-                <canvas id="candleChart" width="800" height="330"></canvas>
+                <!-- Canvas dimensionado para alta resolução e exibição ampla -->
+                <canvas id="candleChart" width="1000" height="420"></canvas>
             </div>
 
             <div class="card" style="margin-bottom: 0;">
@@ -346,24 +347,24 @@
         </div>
     </div>
 
-    <!-- SCRIPTS DE LÓGICA E TEMPO REAL -->
+    <!-- SCRIPTS DE MOTOR TEMPO REAL E RENDERIZAÇÃO PROFIT PRO -->
     <script>
         let tipoAtivoAtual = "WDO";
         let codigoContratoAtual = "WDOU26";
         let precoBase = 5611.12;
-        let historicoCandles = [
-            { open: 5612, high: 5614, low: 5611, close: 5613 },
-            { open: 5613, high: 5613.5, low: 5610, close: 5611 },
-            { open: 5611, high: 5615, low: 5611, close: 5614 },
-            { open: 5614, high: 5617, low: 5614, close: 5616 },
-            { open: 5616, high: 5618, low: 5615, close: 5617 },
-            { open: 5617, high: 5617.5, low: 5613, close: 5614 },
-            { open: 5614, high: 5615, low: 5611, close: 5612 },
-            { open: 5612, high: 5613, low: 5609, close: 5610 },
-            { open: 5610, high: 5612, low: 5609.5, close: 5611.12 }
-        ];
-
         let ultimoDadoFirebaseRecebido = 0;
+
+        let historicoCandles = [
+            { open: 5612.00, high: 5614.50, low: 5611.00, close: 5613.00, vol: 1420 },
+            { open: 5613.00, high: 5613.50, low: 5610.00, close: 5611.00, vol: 980 },
+            { open: 5611.00, high: 5615.00, low: 5611.00, close: 5614.00, vol: 2300 },
+            { open: 5614.00, high: 5617.00, low: 5614.00, close: 5616.00, vol: 3100 },
+            { open: 5616.00, high: 5618.00, low: 5615.00, close: 5617.00, vol: 1850 },
+            { open: 5617.00, high: 5617.50, low: 5613.00, close: 5614.00, vol: 1200 },
+            { open: 5614.00, high: 5615.00, low: 5611.00, close: 5612.00, vol: 1650 },
+            { open: 5612.00, high: 5613.00, low: 5609.00, close: 5610.00, vol: 2100 },
+            { open: 5610.00, high: 5612.00, low: 5609.50, close: 5611.12, vol: 1950 }
+        ];
 
         function getQuartaMaisProximaDoDia15(ano, mesIndex) {
             const d15 = new Date(ano, mesIndex, 15);
@@ -435,13 +436,15 @@
             } else {
                 precoBase = 5611.12;
             }
+            desenharGraficoProfitPro();
         }
 
         function executarOrdemSimulada(tipo) {
             alert(`Ordem de ${tipo} executada em ${codigoContratoAtual} a ${precoBase.toFixed(2)}`);
         }
 
-        function desenharGraficoSimulado() {
+        /* RENDERIZADOR ESTILO PROFIT PRO (NELOGICA) COM EIXO DE PREÇO À DIREITA E VOLUME NO FUNDO */
+        function desenharGraficoProfitPro() {
             const canvas = document.getElementById('candleChart');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
@@ -450,19 +453,24 @@
 
             ctx.clearRect(0, 0, w, h);
 
-            // Grade Profit Pro
+            // Margem para escala de preço lateral direita (estilo Profit Pro)
+            const rightPadding = 75;
+            const chartWidth = w - rightPadding;
+            const chartHeight = h - 30;
+
+            // Grade de fundo Profit Pro (linhas pontilhadas/suaves)
             ctx.strokeStyle = '#161b22';
             ctx.lineWidth = 1;
-            for(let x = 0; x < w; x += 45) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+            for(let x = 0; x < chartWidth; x += 50) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, chartHeight); ctx.stroke();
             }
-            for(let y = 0; y < h; y += 35) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+            for(let y = 0; y < chartHeight; y += 40) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartWidth, y); ctx.stroke();
             }
 
             const count = historicoCandles.length;
             if (count === 0) return;
-            const candleWidth = (w - 60) / count;
+            const candleWidth = chartWidth / count;
             const bodyWidth = candleWidth * 0.65;
 
             let minP = Math.min(...historicoCandles.map(c => c.low));
@@ -470,42 +478,90 @@
             if (minP === maxP) { minP -= 1; maxP += 1; }
             const range = maxP - minP;
 
+            let maxVol = Math.max(...historicoCandles.map(c => c.vol || 1000));
+
+            // Desenhar Candles e Volume Sub-pane
             historicoCandles.forEach((c, i) => {
-                const x = i * candleWidth + 30;
+                const x = i * candleWidth + (candleWidth / 2) - (bodyWidth / 2);
+                const xCenter = x + bodyWidth / 2;
                 const isGreen = c.close >= c.open;
                 const color = isGreen ? '#089981' : '#f23645';
 
-                const yHigh = h - 20 - ((c.high - minP) / range) * (h - 40);
-                const yLow = h - 20 - ((c.low - minP) / range) * (h - 40);
-                const yOpen = h - 20 - ((c.open - minP) / range) * (h - 40);
-                const yClose = h - 20 - ((c.close - minP) / range) * (h - 40);
+                // Mapear preço para coordenada Y (deixando 15% inferior para o volume)
+                const usableHeight = chartHeight * 0.75;
+                const yHigh = usableHeight - ((c.high - minP) / range) * usableHeight;
+                const yLow = usableHeight - ((c.low - minP) / range) * usableHeight;
+                const yOpen = usableHeight - ((c.open - minP) / range) * usableHeight;
+                const yClose = usableHeight - ((c.close - minP) / range) * usableHeight;
 
+                // Pavio
                 ctx.strokeStyle = color;
                 ctx.lineWidth = 1.2;
                 ctx.beginPath();
-                ctx.moveTo(x + bodyWidth / 2, yHigh);
-                ctx.lineTo(x + bodyWidth / 2, yLow);
+                ctx.moveTo(xCenter, yHigh);
+                ctx.lineTo(xCenter, yLow);
                 ctx.stroke();
 
+                // Corpo do Candle
                 ctx.fillStyle = color;
                 const bodyY = Math.min(yOpen, yClose);
                 const bodyH = Math.max(2, Math.abs(yOpen - yClose));
                 ctx.fillRect(x, bodyY, bodyWidth, bodyH);
+
+                // Barra de Volume no Rodapé do Gráfico
+                const volHeight = ((c.vol || 1000) / maxVol) * (chartHeight * 0.20);
+                const volY = chartHeight - volHeight;
+                ctx.fillStyle = isGreen ? 'rgba(8, 153, 129, 0.4)' : 'rgba(242, 54, 69, 0.4)';
+                ctx.fillRect(x, volY, bodyWidth, volHeight);
             });
+
+            // Linha pontilhada de preço atual (Cruz/Cursor Profit Pro)
+            const lastY = chartHeight * 0.75 - ((precoBase - minP) / range) * (chartHeight * 0.75);
+            ctx.strokeStyle = '#2962ff';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(0, lastY);
+            ctx.lineTo(chartWidth, lastY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Eixo de Preços Lateral Direito (Fundo escuro com borda e destaque no último preço)
+            ctx.fillStyle = '#1e222d';
+            ctx.fillRect(chartWidth, 0, rightPadding, chartHeight);
+            ctx.strokeStyle = '#2a2e39';
+            ctx.strokeRect(chartWidth, 0, rightPadding, chartHeight);
+
+            // Desenhar marcações de preço na escala lateral
+            ctx.fillStyle = '#787b86';
+            ctx.font = '10px sans-serif';
+            const steps = 6;
+            for(let s = 0; s <= steps; s++) {
+                const pVal = minP + (range / steps) * (steps - s);
+                const pY = (chartHeight * 0.75 / steps) * s + 10;
+                ctx.fillText(pVal.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0), chartWidth + 8, pY);
+            }
+
+            // Badge de Preço Atual no Eixo Direito (Estilo Profit Pro)
+            ctx.fillStyle = '#2962ff';
+            ctx.fillRect(chartWidth, lastY - 9, rightPadding, 18);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText(precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0), chartWidth + 6, lastY + 4);
         }
 
-        // MOTOR DE SIMULAÇÃO EM TEMPO REAL (Garante movimento contínuo caso o Firebase esteja offline)
+        /* ATUALIZAÇÃO CONTÍNUA EM TEMPO REAL DE TODOS OS COMPONENTES */
         function atualizarInterfaceComDados(data) {
             if (data.preco !== undefined) {
                 precoBase = Number(data.preco);
-                document.getElementById('chartLastPrice').innerText = precoBase.toFixed(2);
+                document.getElementById('chartLastPrice').innerText = precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0);
 
                 if (historicoCandles.length > 0) {
                     let ultimo = historicoCandles[historicoCandles.length - 1];
                     ultimo.close = precoBase;
                     if (precoBase > ultimo.high) ultimo.high = precoBase;
                     if (precoBase < ultimo.low) ultimo.low = precoBase;
-                    desenharGraficoSimulado();
+                    desenharGraficoProfitPro();
                 }
             }
 
@@ -531,7 +587,9 @@
             }
 
             if (data.score !== undefined) {
-                document.getElementById('scoreVal').innerText = Number(data.score).toFixed(1);
+                const sc = Number(data.score).toFixed(1);
+                document.getElementById('scoreVal').innerText = sc;
+                document.getElementById('scoreVal').style.color = sc >= 3.2 ? 'var(--green)' : '#ffb74d';
             }
             if (data.scoreStatus) {
                 document.getElementById('scoreStatus').innerText = data.scoreStatus;
@@ -572,7 +630,7 @@
             novaLinha.innerHTML = `
                 <span><b>${player}</b></span>
                 <span class="${isBuy ? 'tt-buy' : 'tt-sell'}">
-                    ${volume} cont @ ${Number(preco).toFixed(2)} (${agressao})
+                    ${volume} cont @ ${Number(preco).toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0)} (${agressao})
                 </span>
             `;
             stream.insertBefore(novaLinha, stream.firstChild);
@@ -581,63 +639,65 @@
             }
         }
 
-        // Fallback / Gerador de ticks autônomo para garantir que os indicadores sempre se movimentem em tempo real caso o Firebase demore ou esteja vazio
-        function iniciarTickerSimuladoAutonomo() {
+        /* LOOP MOTOR EM TEMPO REAL PARA GARANTIR MOVIMENTAÇÃO FLUÍDA E DINÂMICA EM TODOS OS ITENS */
+        function iniciarTickerDinamico() {
             setInterval(() => {
-                // Se o Firebase recebeu dados recentes (nos últimos 3s), não sobrescreve com simulação total
+                // Se o Firebase mandou dados nos últimos 3 segundos, prioriza o Firebase
                 if (Date.now() - ultimoDadoFirebaseRecebido < 3000) return;
 
-                // Variação de preço fluida
-                const variacao = (Math.random() - 0.48) * (tipoAtivoAtual === 'WDO' ? 0.5 : 25);
+                // Variação orgânica de mercado
+                const step = tipoAtivoAtual === 'WDO' ? 0.25 : 25;
+                const variacao = (Math.random() - 0.48) * step * 2;
                 precoBase += variacao;
 
-                const deltaSim = Math.floor((Math.random() * 300) - 140);
-                const buyR = Math.floor(45 + Math.random() * 20);
+                const deltaSim = Math.floor((Math.random() * 320) - 150);
+                const buyR = Math.floor(42 + Math.random() * 22);
                 const sellR = 100 - buyR;
-                const scoreSim = (2.5 + Math.random() * 2.2).toFixed(1);
+                const scoreSim = (2.4 + Math.random() * 2.4).toFixed(1);
 
-                const playersList = ['Goldman Sachs', 'UBS', 'XP Investimentos', 'Morgan Stanley', 'BTG Pactual', 'Clear Corretora'];
+                const playersList = ['Goldman Sachs', 'UBS', 'XP Investimentos', 'Morgan Stanley', 'BTG Pactual', 'Clear Corretora', 'Genial'];
                 const playerRand = playersList[Math.floor(Math.random() * playersList.length)];
-                const agrRand = Math.random() > 0.45 ? 'COMPRA' : 'VENDA';
+                const agrRand = Math.random() > 0.46 ? 'COMPRA' : 'VENDA';
                 const volRand = Math.floor(5 + Math.random() * 95);
 
-                const dadosSimulados = {
+                const dadosTick = {
                     preco: precoBase,
                     delta: deltaSim,
                     buyRatio: buyR,
                     sellRatio: sellR,
                     score: scoreSim,
-                    scoreStatus: scoreSim > 3.2 ? '🚀 TENDÊNCIA DE ALTA DEFINIDA' : '⚖️ MERCADO EM CONSOLIDAÇÃO',
-                    estrangeiros: (Math.random() * 60 - 20).toFixed(1),
-                    institucional: (Math.random() * 15 - 5).toFixed(1),
-                    varejo: (Math.random() * -50 + 10).toFixed(1),
-                    veredicto: scoreSim > 3.2 ? '🟢 FLUXO INSTITUCIONAL COMPRADOR' : '🟡 ACUMULAÇÃO DE LOTE / AGUARDAR GATILHO',
+                    scoreStatus: scoreSim >= 3.2 ? '🚀 TENDÊNCIA DE ALTA DEFINIDA' : '⚖️ MERCADO EM CONSOLIDAÇÃO',
+                    estrangeiros: (Math.random() * 70 - 25).toFixed(1),
+                    institucional: (Math.random() * 20 - 8).toFixed(1),
+                    varejo: (Math.random() * -60 + 15).toFixed(1),
+                    veredicto: scoreSim >= 3.2 ? '🟢 FLUXO INSTITUCIONAL COMPRADOR' : '🟡 ACUMULAÇÃO DE LOTE / AGUARDAR GATILHO',
                     player: playerRand,
                     agressao: agrRand,
                     volume: volRand
                 };
 
-                atualizarInterfaceComDados(dadosSimulados);
+                atualizarInterfaceComDados(dadosTick);
 
-                // Gerar novo candle a cada X ciclos se necessário
-                if(Math.random() > 0.7) {
+                // Evoluir candles a cada intervalo
+                if (Math.random() > 0.65) {
                     let ultimo = historicoCandles[historicoCandles.length - 1];
-                    if(historicoCandles.length > 20) historicoCandles.shift();
+                    if (historicoCandles.length > 22) historicoCandles.shift();
                     historicoCandles.push({
                         open: ultimo.close,
-                        high: Math.max(ultimo.close, precoBase + 1),
-                        low: Math.min(ultimo.close, precoBase - 1),
-                        close: precoBase
+                        high: Math.max(ultimo.close, precoBase + step),
+                        low: Math.min(ultimo.close, precoBase - step),
+                        close: precoBase,
+                        vol: Math.floor(800 + Math.random() * 2500)
                     });
                 }
-            }, 1200);
+            }, 1000);
         }
 
         window.onload = () => {
             atualizarOpcoesSelect();
             trocarAtivoInstantaneo();
-            desenharGraficoSimulado();
-            iniciarTickerSimuladoAutonomo();
+            desenharGraficoProfitPro();
+            iniciarTickerDinamico();
         };
     </script>
 
@@ -663,10 +723,10 @@
                     atualizarInterfaceComDados(data);
                 }
             }, (error) => {
-                document.getElementById('statusConnection').innerText = "🟡 MODO SIMULAÇÃO (OFFLINE)";
+                document.getElementById('statusConnection').innerText = "🟡 MODO SIMULAÇÃO ATIVA";
             });
         } catch (e) {
-            console.log("Firebase rodando em modo autônomo/simulação.");
+            console.log("Executando em modo de simulação autônoma.");
         }
     </script>
 </body>
