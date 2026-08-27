@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime &bull; ProfitChart Style & Gerenciamento</title>
+    <title>Skaunder Prime &bull; Terminal Profit & Simulação ao Vivo</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
@@ -25,7 +25,7 @@
             margin: 0;
             padding: 12px;
         }
-        .container { max-width: 1300px; margin: 0 auto; }
+        .container { max-width: 1350px; margin: 0 auto; }
         
         .header {
             display: flex;
@@ -53,31 +53,30 @@
             gap: 12px;
             margin-bottom: 12px;
         }
-        @media(max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+        @media(max-width: 950px) { .main-grid { grid-template-columns: 1fr; } }
 
         .panel {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 14px;
+            margin-bottom: 12px;
         }
         .panel h3 { margin: 0 0 10px 0; font-size: 11px; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
 
-        /* Gráfico Estilo ProfitChart (TradingView Widget Container) */
         .chart-container {
             width: 100%;
-            height: 420px;
+            height: 480px;
             background: #000;
             border-radius: 4px;
             overflow: hidden;
             border: 1px solid var(--border-color);
         }
 
-        /* Painel de Sinais e Execução */
         .decision-box {
             border: 2px solid var(--border-color);
             border-radius: 6px;
-            padding: 16px;
+            padding: 14px;
             text-align: center;
             margin-bottom: 12px;
             background: #11161d;
@@ -88,44 +87,59 @@
 
         .signal-badge {
             display: inline-block; padding: 4px 12px; border-radius: 12px;
-            font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px;
+            font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 6px;
         }
         .signal-badge.buy { background: rgba(35,134,54,0.2); color: var(--green); border: 1px solid var(--green); }
         .signal-badge.sell { background: rgba(218,54,51,0.2); color: var(--red); border: 1px solid var(--red); }
         .signal-badge.wait { background: rgba(210,153,34,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
 
-        .verdict-title { font-size: 18px; font-weight: 800; margin: 0 0 6px 0; }
-        .verdict-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+        .verdict-title { font-size: 16px; font-weight: 800; margin: 0 0 4px 0; }
+        .verdict-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
 
-        .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-        .metric-card { background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; text-align: center; }
+        .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+        .metric-card { background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; padding: 6px; text-align: center; }
         .metric-card span { font-size: 9px; color: var(--text-muted); text-transform: uppercase; display: block; }
-        .metric-card strong { font-size: 13px; margin-top: 2px; display: block; }
+        .metric-card strong { font-size: 12px; margin-top: 2px; display: block; }
 
-        /* Ledger / Acumulado de Gain e Loss */
-        .ledger-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+        /* Painel de Execução Simulada (Simula Ordem no MT5) */
+        .exec-panel { background: #121820; border: 1px solid var(--accent); border-radius: 6px; padding: 12px; margin-bottom: 12px; }
+        .exec-panel h3 { color: var(--accent); border-bottom-color: rgba(88,166,255,0.2); }
+        
+        .order-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .btn-order { padding: 10px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; border: none; color: #fff; transition: 0.1s; }
+        .btn-buy { background: var(--green); }
+        .btn-buy:hover { background: #2ea043; }
+        .btn-sell { background: var(--red); }
+        .btn-sell:hover { background: #f85149; }
+
+        /* Posição Aberta Ativa */
+        .position-box { background: #0d1117; border: 1px dashed var(--border-color); border-radius: 4px; padding: 10px; font-size: 11px; display: none; }
+        .position-box.active { display: block; border-color: var(--accent); }
+        .pos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
+
+        .ledger-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
         .ledger-box { background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; padding: 6px; text-align: center; }
         .ledger-box span { font-size: 9px; color: var(--text-muted); display: block; }
-        .ledger-box strong { font-size: 12px; display: block; margin-top: 2px; }
+        .ledger-box strong { font-size: 11px; display: block; margin-top: 2px; }
 
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn-group { display: grid; grid-template-columns: 1fr; gap: 6px; }
         .btn {
             background: #21262d; color: var(--text-main); border: 1px solid var(--border-color);
-            padding: 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;
+            padding: 7px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; text-align: center;
         }
-        .btn.btn-green:hover { background: var(--green); border-color: var(--green); }
-        .btn.btn-red:hover { background: var(--red); border-color: var(--red); }
-        .btn.btn-reset { grid-column: span 2; background: #30363d; font-size: 10px; padding: 4px; color: var(--text-muted); }
+        .btn.btn-close { background: #8957e5; border-color: #8957e5; color: #fff; }
+        .btn.btn-close:hover { background: #a371f7; }
+        .btn.btn-reset { background: #30363d; font-size: 10px; color: var(--text-muted); }
         .btn.btn-reset:hover { color: #fff; }
 
-        .footer-info { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 8px; }
+        .footer-info { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 6px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1><span id="connDot" class="status-dot"></span> SKAUNDER STREAM &bull; TERMINAL PROFIT (M1)</h1>
+        <h1><span id="connDot" class="status-dot"></span> SKAUNDER STREAM &bull; SIMULADOR AO VIVO (MT5)</h1>
         <div>
             <label for="assetSelect" style="font-size: 11px; color: var(--text-muted); margin-right: 6px;">ATIVO MT5:</label>
             <select id="assetSelect">
@@ -136,15 +150,15 @@
     </div>
 
     <div class="main-grid">
-        <!-- COLUNA ESQUERDA: GRÁFICO EM TEMPO REAL 1 MINUTO (ESTILO PROFITCHART) -->
+        <!-- COLUNA ESQUERDA: GRÁFICO M1 ESTILO PROFITCHART -->
         <div class="panel">
             <h3 id="chartTitle">Gráfico de Cotação M1 &bull; WINV26</h3>
             <div class="chart-container" id="tradingview_widget"></div>
         </div>
 
-        <!-- COLUNA DIREITA: SINAIS & GERENCIAMENTO DE GAIN/LOSS -->
+        <!-- COLUNA DIREITA: SINAIS, SIMULADOR DE ORDENS E GERENCIAMENTO -->
         <div>
-            <!-- PAINEL DE DECISÃO -->
+            <!-- PAINEL DE SINAIS DO MT5 -->
             <div id="decisionBox" class="decision-box wait">
                 <div id="signalBadge" class="signal-badge wait">Aguardando Confluência</div>
                 <h2 id="verdictTitle" class="verdict-title">MONITORANDO MT5</h2>
@@ -166,9 +180,35 @@
                 </div>
             </div>
 
-            <!-- GERENCIAMENTO DE ACUMULADO (GAIN / LOSS) -->
+            <!-- MENU DE SIMULAÇÃO DE COMPRA E VENDA EM TEMPO REAL -->
+            <div class="panel exec-panel">
+                <h3>Simulador de Execução (Estilo MetaTrader 5)</h3>
+                
+                <div class="order-buttons">
+                    <button class="btn-order btn-buy" onclick="simularOrdem('COMPRA')">&#9650; Comprar a Mercado</button>
+                    <button class="btn-order btn-sell" onclick="simularOrdem('VENDA')">&#9660; Vender a Mercado</button>
+                </div>
+
+                <!-- Caixa de Posição Ativa -->
+                <div id="positionBox" class="position-box">
+                    <div style="font-weight: bold; margin-bottom: 6px; color: var(--accent); display: flex; justify-content: space-between;">
+                        <span>POSIÇÃO ABERTA: <span id="posTipo">--</span></span>
+                        <span id="posAtivoStr">--</span>
+                    </div>
+                    <div class="pos-grid">
+                        <div>Entrada: <strong id="posPrecoEntrada">0.00</strong></div>
+                        <div>Atual: <strong id="posPrecoAtual">0.00</strong></div>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 8px; font-size: 13px;">
+                        Resultado Flutuante: <strong id="posResultado">0 pts</strong>
+                    </div>
+                    <button class="btn btn-close" onclick="fecharPosicaoSimulada()">Zerar / Fechar Posição a Mercado</button>
+                </div>
+            </div>
+
+            <!-- ACUMULADO DA SESSÃO -->
             <div class="panel">
-                <h3>Acumulado da Sessão (Stop Curto / Alvo Longo)</h3>
+                <h3>Acumulado da Sessão (Gain / Loss)</h3>
                 
                 <div class="ledger-grid">
                     <div class="ledger-box">
@@ -190,8 +230,6 @@
                 </div>
 
                 <div class="btn-group">
-                    <button class="btn btn-green" onclick="registrarTrade('GAIN')">+ Registrar Gain (Alvo Longo)</button>
-                    <button class="btn btn-red" onclick="registrarTrade('LOSS')">- Registrar Loss (Stop Curto)</button>
                     <button class="btn btn-reset" onclick="zerarLedger()">Zerar Estatísticas da Sessão</button>
                 </div>
             </div>
@@ -204,26 +242,23 @@
     </div>
 </div>
 
-<!-- Script do Widget TradingView (Gráfico M1 / Tempo Real estilo ProfitChart) -->
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
     let tvWidget = null;
+    let ultimoPrecoGlobal = 0;
 
     function carregarGrafico(ativo) {
-        // Mapeia o ticker do MT5 para o formato compatível com o TradingView (B3)
-        let tvSymbol = "BMF:" + ativo;
-        
+        let tvSymbol = "BMFBOVESPA:" + ativo;
         document.getElementById('chartTitle').innerText = "Gráfico M1 &bull; " + ativo;
-        
         document.getElementById('tradingview_widget').innerHTML = "";
         
         tvWidget = new TradingView.widget({
             "autosize": true,
             "symbol": tvSymbol,
-            "interval": "1", // Gráfico de 1 Minuto estilo ProfitChart
+            "interval": "1",
             "timezone": "America/Sao_Paulo",
             "theme": "dark",
-            "style": "1", // Candlestick
+            "style": "1",
             "locale": "br",
             "toolbar_bg": "#161b22",
             "enable_publishing": false,
@@ -233,7 +268,6 @@
         });
     }
 
-    // Inicialização Firebase
     const firebaseConfig = { databaseURL: "https://skaunder-prime-default-rtdb.firebaseio.com" };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -251,8 +285,72 @@
     const mScore = document.getElementById('mScore');
     const lblHora = document.getElementById('lblHora');
 
-    // Variáveis de Gerenciamento de Gain/Loss
+    // Variáveis do Simulador de Ordens e Acumulado
+    let posicao = { ativa: false, tipo: null, precoEntrada: 0, ativo: '' };
     let sessionData = { ops: 0, wins: 0, losses: 0, points: 0 };
+
+    function simularOrdem(tipo) {
+        if (ultimoPrecoGlobal <= 0) {
+            alert("Aguardando conexão de preço com o MetaTrader 5 para executar.");
+            return;
+        }
+
+        posicao.ativa = true;
+        posicao.tipo = tipo;
+        posicao.precoEntrada = ultimoPrecoGlobal;
+        posicao.ativo = assetSelect.value;
+
+        document.getElementById('posTipo').innerText = tipo;
+        document.getElementById('posTipo').style.color = tipo === 'COMPRA' ? "var(--green)" : "var(--red)";
+        document.getElementById('posAtivoStr').innerText = posicao.ativo;
+        document.getElementById('posPrecoEntrada').innerText = posicao.precoEntrada.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        document.getElementById('positionBox').className = "position-box active";
+        
+        atualizarPosicaoFlutuante();
+    }
+
+    function atualizarPosicaoFlutuante() {
+        if (!posicao.ativa) return;
+
+        document.getElementById('posPrecoAtual').innerText = ultimoPrecoGlobal.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        
+        let diferencaPts = 0;
+        if (posicao.tipo === 'COMPRA') {
+            diferencaPts = ultimoPrecoGlobal - posicao.precoEntrada;
+        } else {
+            diferencaPts = posicao.precoEntrada - ultimoPrecoGlobal;
+        }
+
+        let resEl = document.getElementById('posResultado');
+        let sinalStr = diferencaPts >= 0 ? "+" : "";
+        resEl.innerText = sinalStr + diferencaPts.toFixed(2) + " pts";
+        resEl.style.color = diferencaPts >= 0 ? "var(--green)" : "var(--red)";
+    }
+
+    function fecharPosicaoSimulada() {
+        if (!posicao.ativa) return;
+
+        let diferencaPts = 0;
+        if (posicao.tipo === 'COMPRA') {
+            diferencaPts = ultimoPrecoGlobal - posicao.precoEntrada;
+        } else {
+            diferencaPts = posicao.precoEntrada - ultimoPrecoGlobal;
+        }
+
+        sessionData.ops++;
+        if (diferencaPts >= 0) {
+            sessionData.wins++;
+        } else {
+            sessionData.losses++;
+        }
+        sessionData.points += diferencaPts;
+
+        atualizarLedgerUI();
+
+        // Reseta posição
+        posicao.ativa = false;
+        document.getElementById('positionBox').className = "position-box";
+    }
 
     function atualizarLedgerUI() {
         document.getElementById('accOps').innerText = sessionData.ops;
@@ -260,25 +358,9 @@
         document.getElementById('accLosses').innerText = sessionData.losses;
         
         let ptsEl = document.getElementById('accPoints');
-        ptsEl.innerText = sessionData.points + " pts";
-        ptsEl.style.color = sessionData.points >= 0 ? "var(--green)" : "var(--red)";
-    }
-
-    function registrarTrade(resultado) {
-        let ativo = assetSelect.value;
-        let isWin = ativo.includes("WIN");
-        let gainPts = isWin ? 450 : 45;
-        let lossPts = isWin ? 150 : 15;
-
-        sessionData.ops++;
-        if (resultado === 'GAIN') {
-            sessionData.wins++;
-            sessionData.points += gainPts;
-        } else {
-            sessionData.losses++;
-            sessionData.points -= lossPts;
-        }
-        atualizarLedgerUI();
+        let ptsVal = sessionData.points;
+        ptsEl.innerText = (ptsVal >= 0 ? "+" : "") + ptsVal.toFixed(2) + " pts";
+        ptsEl.style.color = ptsVal >= 0 ? "var(--green)" : "var(--red)";
     }
 
     function zerarLedger() {
@@ -292,6 +374,9 @@
         let score = Number(data.score) || 0;
         let agressao = data.agressao || "NEUTRO";
 
+        ultimoPrecoGlobal = preco;
+        atualizarPosicaoFlutuante();
+
         mPreco.innerText = preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         mDelta.innerText = delta;
         mDelta.style.color = delta >= 0 ? "var(--green)" : "var(--red)";
@@ -304,14 +389,14 @@
             signalBadge.innerText = "Sinal Aprovado &bull; Compra";
             verdictTitle.innerText = "ALVO LONGO COMPRADOR";
             verdictTitle.style.color = "var(--green)";
-            verdictSub.innerText = "MME Alinhada e Fluxo Positivo. Executar Compra.";
+            verdictSub.innerText = "MME Alinhada e Fluxo Positivo. Pronto para executar.";
         } else if (score >= 3 && agressao === "VENDA") {
             decisionBox.className = "decision-box sell";
             signalBadge.className = "signal-badge sell";
             signalBadge.innerText = "Sinal Aprovado &bull; Venda";
             verdictTitle.innerText = "ALVO LONGO VENDEDOR";
             verdictTitle.style.color = "var(--red)";
-            verdictSub.innerText = "MME Alinhada e Fluxo Negativo. Executar Venda.";
+            verdictSub.innerText = "MME Alinhada e Fluxo Negativo. Pronto para executar.";
         } else {
             decisionBox.className = "decision-box wait";
             signalBadge.className = "signal-badge wait";
@@ -327,6 +412,11 @@
         currentRef = db.ref(ativo);
         connDot.className = "status-dot";
         
+        // Se trocar de ativo e houver posição aberta em outro, fecha ou avisa
+        if (posicao.ativa && posicao.ativo !== ativo) {
+            fecharPosicaoSimulada();
+        }
+
         currentRef.on('value', (snap) => {
             const data = snap.val();
             if (data) {
@@ -342,7 +432,6 @@
         carregarGrafico(ativo);
     }
 
-    // Inicialização
     monitorarAtivo(assetSelect.value);
     assetSelect.addEventListener('change', (e) => {
         monitorarAtivo(e.target.value);
