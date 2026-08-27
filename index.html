@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skaunder Prime - Real-Time Dashboard</title>
-    <!-- Firebase App (core) e Realtime Database -->
+    <!-- Firebase App (core) e Realtime Database (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
@@ -110,7 +110,7 @@
     </div>
 
     <div class="footer-status">
-        Última atualização: <span id="hora">--:--:--</span> | Status: <span id="statusConn" style="color: #238636;">Conectado</span>
+        Última atualização: <span id="hora">--:--:--</span> | Status: <span id="statusConn" style="color: #238636;">Conectando...</span>
     </div>
 </div>
 
@@ -121,8 +121,6 @@
 
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
-    } else {
-        firebase.app();
     }
 
     const db = firebase.database();
@@ -141,10 +139,13 @@
             currentRef.off();
         }
 
+        console.log("Iniciando monitoramento para o caminho:", ativo);
         currentRef = db.ref(ativo);
         
         currentRef.on('value', (snapshot) => {
             const data = snapshot.val();
+            console.log("Dados recebidos do Firebase para [" + ativo + "]:", data);
+            
             if (data) {
                 elPreco.innerText = Number(data.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 elDelta.innerText = data.delta;
@@ -155,26 +156,29 @@
                 
                 elVolume.innerText = data.volume;
                 elHora.innerText = data.hora || '--:--:--';
-                elStatus.innerText = "Sincronizado";
+                elStatus.innerText = "Sincronizado (" + ativo + ")";
                 elStatus.style.color = "#238636";
             } else {
+                console.warn("Nenhum dado encontrado no nó:", ativo);
                 elPreco.innerText = "--";
                 elDelta.innerText = "--";
                 elAgressao.innerText = "--";
                 elVolume.innerText = "--";
                 elHora.innerText = "--:--:--";
-                elStatus.innerText = "Aguardando dados...";
+                elStatus.innerText = "Aguardando dados de " + ativo + "...";
                 elStatus.style.color = "#d29922";
             }
         }, (error) => {
-            console.error(error);
+            console.error("Erro na escuta do Firebase:", error);
             elStatus.innerText = "Erro de Conexão";
             elStatus.style.color = "#da3633";
         });
     }
 
+    // Inicializa com o ativo selecionado
     monitorarAtivo(assetSelect.value);
 
+    // Troca de ativo dinamicamente ao mudar no select
     assetSelect.addEventListener('change', (e) => {
         monitorarAtivo(e.target.value);
     });
