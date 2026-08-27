@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime | Profit Pro Layout (Ultra Fast)</title>
+    <title>Skaunder Prime | Profit Pro Layout (1m Candles)</title>
     <style>
         :root {
             --bg-dark: #12161f;
@@ -319,7 +319,7 @@
                 <div class="chart-header">
                     <div class="chart-title">
                         <span id="chartSymbol">WDOU26</span>
-                        <span id="chartBadge" class="chart-badge">10s (PRO)</span>
+                        <span id="chartBadge" class="chart-badge">1m (PRO)</span>
                     </div>
                     <div style="font-size: 11px; color: var(--text-muted);">
                         ULT: <b id="chartLastPrice" style="color: #fff;">5611.12</b>
@@ -328,8 +328,8 @@
                 
                 <div class="chart-toolbar">
                     <button class="tb-btn">🕯️ Candles</button>
-                    <button class="tb-btn active">10s</button>
-                    <button class="tb-btn">1m</button>
+                    <button class="tb-btn">10s</button>
+                    <button class="tb-btn active">1m</button>
                     <button class="tb-btn">VWAP / Regressão</button>
                     <button class="tb-btn" style="margin-left:auto;">🔍 Zoom Pro</button>
                 </div>
@@ -423,15 +423,15 @@
             if (tipoAtivoAtual === 'WIN') {
                 precoBase = 128500.00;
                 historicoCandles = [
-                    { open: 128400, high: 128600, low: 128350, close: 128500, vol: 1520 },
-                    { open: 128500, high: 128650, low: 128420, close: 128600, vol: 1840 },
-                    { open: 128600, high: 128800, low: 128550, close: 128720, vol: 2410 },
-                    { open: 128720, high: 128900, low: 128680, close: 128840, vol: 3100 },
-                    { open: 128840, high: 128950, low: 128750, close: 128800, vol: 1950 },
-                    { open: 128800, high: 128850, low: 128600, close: 128650, vol: 1420 },
-                    { open: 128650, high: 128750, low: 128500, close: 128500, vol: 1760 },
-                    { open: 128500, high: 128600, low: 128380, close: 128450, vol: 2100 },
-                    { open: 128450, high: 128580, low: 128400, close: 128500, vol: 1650 }
+                    { open: 128400, high: 128600, low: 128350, close: 128500, vol: 15200 },
+                    { open: 128500, high: 128650, low: 128420, close: 128600, vol: 18400 },
+                    { open: 128600, high: 128800, low: 128550, close: 128720, vol: 24100 },
+                    { open: 128720, high: 128900, low: 128680, close: 128840, vol: 31000 },
+                    { open: 128840, high: 128950, low: 128750, close: 128800, vol: 19500 },
+                    { open: 128800, high: 128850, low: 128600, close: 128650, vol: 14200 },
+                    { open: 128650, high: 128750, low: 128500, close: 128500, vol: 17600 },
+                    { open: 128500, high: 128600, low: 128380, close: 128450, vol: 21000 },
+                    { open: 128450, high: 128580, low: 128400, close: 128500, vol: 16500 }
                 ];
                 document.getElementById('valEstrangeiros').className = 'player-val-buy';
                 document.getElementById('valEstrangeiros').innerHTML = '+R$ 142.5M <small>(COMPRA)</small>';
@@ -442,15 +442,15 @@
             } else {
                 precoBase = 5611.12;
                 historicoCandles = [
-                    { open: 5612.00, high: 5614.50, low: 5611.00, close: 5613.00, vol: 142 },
-                    { open: 5613.00, high: 5613.50, low: 5610.00, close: 5611.00, vol: 98 },
-                    { open: 5611.00, high: 5615.00, low: 5611.00, close: 5614.00, vol: 230 },
-                    { open: 5614.00, high: 5617.00, low: 5614.00, close: 5616.00, vol: 310 },
-                    { open: 5616.00, high: 5618.00, low: 5615.00, close: 5617.00, vol: 185 },
-                    { open: 5617.00, high: 5617.50, low: 5613.00, close: 5614.00, vol: 120 },
-                    { open: 5614.00, high: 5615.00, low: 5611.00, close: 5612.00, vol: 165 },
-                    { open: 5612.00, high: 5613.00, low: 5609.00, close: 5610.00, vol: 210 },
-                    { open: 5610.00, high: 5612.00, low: 5609.50, close: 5611.12, vol: 195 }
+                    { open: 5612.00, high: 5614.50, low: 5611.00, close: 5613.00, vol: 1420 },
+                    { open: 5613.00, high: 5613.50, low: 5610.00, close: 5611.00, vol: 980 },
+                    { open: 5611.00, high: 5615.00, low: 5611.00, close: 5614.00, vol: 2300 },
+                    { open: 5614.00, high: 5617.00, low: 5614.00, close: 5616.00, vol: 3100 },
+                    { open: 5616.00, high: 5618.00, low: 5615.00, close: 5617.00, vol: 1850 },
+                    { open: 5617.00, high: 5617.50, low: 5613.00, close: 5614.00, vol: 1200 },
+                    { open: 5614.00, high: 5615.00, low: 5611.00, close: 5612.00, vol: 1650 },
+                    { open: 5612.00, high: 5613.00, low: 5609.00, close: 5610.00, vol: 2100 },
+                    { open: 5610.00, high: 5612.00, low: 5609.50, close: 5611.12, vol: 1950 }
                 ];
                 document.getElementById('valEstrangeiros').className = 'player-val-buy';
                 document.getElementById('valEstrangeiros').innerHTML = '+R$ 41.5M <small>(COMPRA)</small>';
@@ -658,15 +658,15 @@
             }
         }
 
-        // TICKER OTIMIZADO DE ALTA VELOCIDADE (SEM TRAVAS E COM INTERVALO DE 200MS)
+        // TICKER OTIMIZADO DE ALTA VELOCIDADE COM CANDLES DE 1 MINUTO (60000ms)
         function iniciarTickerDinamico() {
-            let intervaloSimulacao = 200; // Atualizações ultra-rápidas (4x por segundo)
+            let intervaloSimulacao = 200; // Atualizações a cada 200ms
             
             setInterval(() => {
                 contadorMilisegundosCandle += intervaloSimulacao;
                 
-                // Fechamento exato do candle de 10 segundos (10000ms)
-                if (contadorMilisegundosCandle >= 10000) {
+                // Fechamento exato do candle de 1 minuto (60000ms)
+                if (contadorMilisegundosCandle >= 60000) {
                     contadorMilisegundosCandle = 0;
                     if (historicoCandles.length > 30) historicoCandles.shift();
                     let ultimoFechamento = historicoCandles[historicoCandles.length - 1].close;
@@ -675,7 +675,7 @@
                         high: ultimoFechamento,
                         low: ultimoFechamento,
                         close: ultimoFechamento,
-                        vol: Math.floor(20 + Math.random() * 80)
+                        vol: Math.floor(100 + Math.random() * 400)
                     });
                 }
 
@@ -733,7 +733,6 @@
             const database = firebase.database();
             const cotacaoRef = database.ref('cotacao');
 
-            // CONEXÃO EM TEMPO REAL IMEDIATA (SEM BLOQUEIOS OU TRAVAS DE LATÊNCIA)
             cotacaoRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
