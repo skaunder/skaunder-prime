@@ -3,220 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime &bull; ASG Flow Engine</title>
+    <title>Skaunder Prime &bull; ProfitChart Style & Gerenciamento</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
         :root {
-            --bg-color: #080b10;
-            --panel-bg: #111620;
-            --border-color: #21262d;
+            --bg-base: #0d1117;
+            --bg-card: #161b22;
+            --border-color: #30363d;
             --text-main: #f0f6fc;
             --text-muted: #8b949e;
-            --green: #2ea043;
-            --red: #f85149;
-            --yellow: #f0883e;
-            --blue: #388bfd;
+            --green: #238636;
+            --red: #da3633;
+            --yellow: #d29922;
+            --accent: #58a6ff;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-base);
             color: var(--text-main);
             margin: 0;
-            padding: 16px;
+            padding: 12px;
         }
-        .wrapper {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        .top-bar {
+        .container { max-width: 1300px; margin: 0 auto; }
+        
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--panel-bg);
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            padding: 14px 20px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-        }
-        .top-bar h1 {
-            font-size: 16px;
-            margin: 0;
-            letter-spacing: 0.5px;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--yellow);
-            display: inline-block;
-        }
-        .status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
-        
-        select {
-            background-color: #1f242c;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
+            padding: 12px 18px;
             border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* PAINEL PRINCIPAL DE DECISÃO ESTILO ASG */
-        .asg-main-panel {
-            background: var(--panel-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            padding: 24px;
-            margin-bottom: 16px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .asg-main-panel.action-buy { border-color: var(--green); background: linear-gradient(180deg, rgba(46,160,67,0.08) 0%, var(--panel-bg) 60%); }
-        .asg-main-panel.action-sell { border-color: var(--red); background: linear-gradient(180deg, rgba(248,81,73,0.08) 0%, var(--panel-bg) 60%); }
-        .asg-main-panel.action-wait { border-color: var(--yellow); background: linear-gradient(180deg, rgba(240,136,62,0.08) 0%, var(--panel-bg) 60%); }
-
-        .signal-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             margin-bottom: 12px;
         }
-        .badge-buy { background: rgba(46,160,67,0.2); color: var(--green); border: 1px solid var(--green); }
-        .badge-sell { background: rgba(248,81,73,0.2); color: var(--red); border: 1px solid var(--red); }
-        .badge-wait { background: rgba(240,136,62,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
-
-        .main-verdict {
-            font-size: 32px;
-            font-weight: 800;
-            margin: 0 0 8px 0;
-            letter-spacing: -0.5px;
-        }
-        .main-context {
-            font-size: 14px;
-            color: var(--text-muted);
-            max-width: 700px;
-            margin: 0 auto 20px auto;
-            line-height: 1.4;
+        .header h1 { font-size: 15px; margin: 0; color: #ffffff; display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--yellow); display: inline-block; }
+        .status-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+        
+        select {
+            background-color: #21262d; color: var(--text-main);
+            border: 1px solid var(--border-color); padding: 6px 10px;
+            border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;
         }
 
-        /* GRID DE EXECUÇÃO OBJETIVA */
-        .exec-grid {
+        .main-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 2fr 1fr;
             gap: 12px;
-            text-align: left;
+            margin-bottom: 12px;
         }
-        .exec-card {
-            background: #161b22;
+        @media(max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+        .panel {
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 14px;
         }
-        .exec-card span {
-            display: block;
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-        .exec-card strong {
-            font-size: 16px;
-            color: #ffffff;
-        }
+        .panel h3 { margin: 0 0 10px 0; font-size: 11px; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
 
-        /* SEÇÃO SECUNDÁRIA DE FILTROS CONSOLIDADOS */
-        .grid-filters {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        @media(max-width: 768px) {
-            .grid-filters { grid-template-columns: 1fr; }
-        }
-        .sub-panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-        }
-        .sub-panel h3 {
-            margin: 0 0 12px 0;
-            font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 6px;
-        }
-        
-        .checklist-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-size: 13px;
-        }
-        .checklist-row:last-child { border-bottom: none; }
-        .check-status {
-            font-weight: bold;
-            padding: 2px 8px;
+        /* Gráfico Estilo ProfitChart (TradingView Widget Container) */
+        .chart-container {
+            width: 100%;
+            height: 420px;
+            background: #000;
             border-radius: 4px;
-            font-size: 11px;
-        }
-        .ok { background: rgba(46,160,67,0.15); color: var(--green); }
-        .no { background: rgba(248,81,73,0.15); color: var(--red); }
-        .pending { background: rgba(240,136,62,0.15); color: var(--yellow); }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .metric-box {
-            background: #161b22;
+            overflow: hidden;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 10px;
-            text-align: center;
         }
-        .metric-box span { font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; }
-        .metric-box strong { font-size: 18px; margin-top: 4px; display: block; }
 
-        .footer-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: var(--text-muted);
-            padding: 4px 8px;
+        /* Painel de Sinais e Execução */
+        .decision-box {
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 12px;
+            background: #11161d;
         }
+        .decision-box.buy { border-color: var(--green); background: rgba(35,134,54,0.08); }
+        .decision-box.sell { border-color: var(--red); background: rgba(218,54,51,0.08); }
+        .decision-box.wait { border-color: var(--yellow); background: rgba(210,153,34,0.08); }
+
+        .signal-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 12px;
+            font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px;
+        }
+        .signal-badge.buy { background: rgba(35,134,54,0.2); color: var(--green); border: 1px solid var(--green); }
+        .signal-badge.sell { background: rgba(218,54,51,0.2); color: var(--red); border: 1px solid var(--red); }
+        .signal-badge.wait { background: rgba(210,153,34,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
+
+        .verdict-title { font-size: 18px; font-weight: 800; margin: 0 0 6px 0; }
+        .verdict-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+
+        .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .metric-card { background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; text-align: center; }
+        .metric-card span { font-size: 9px; color: var(--text-muted); text-transform: uppercase; display: block; }
+        .metric-card strong { font-size: 13px; margin-top: 2px; display: block; }
+
+        /* Ledger / Acumulado de Gain e Loss */
+        .ledger-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+        .ledger-box { background: #0d1117; border: 1px solid var(--border-color); border-radius: 4px; padding: 6px; text-align: center; }
+        .ledger-box span { font-size: 9px; color: var(--text-muted); display: block; }
+        .ledger-box strong { font-size: 12px; display: block; margin-top: 2px; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn {
+            background: #21262d; color: var(--text-main); border: 1px solid var(--border-color);
+            padding: 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn.btn-green:hover { background: var(--green); border-color: var(--green); }
+        .btn.btn-red:hover { background: var(--red); border-color: var(--red); }
+        .btn.btn-reset { grid-column: span 2; background: #30363d; font-size: 10px; padding: 4px; color: var(--text-muted); }
+        .btn.btn-reset:hover { color: #fff; }
+
+        .footer-info { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 8px; }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <!-- BARRA SUPERIOR -->
-    <div class="top-bar">
-        <h1>
-            <span id="connDot" class="status-dot"></span> 
-            SKAUNDER PRIME &bull; MOTOR ASG (FLUXO FILTRADO)
-        </h1>
+<div class="container">
+    <div class="header">
+        <h1><span id="connDot" class="status-dot"></span> SKAUNDER STREAM &bull; TERMINAL PROFIT (M1)</h1>
         <div>
-            <label for="assetSelect" style="font-size: 12px; color: var(--text-muted); margin-right: 6px;">ATIVO:</label>
+            <label for="assetSelect" style="font-size: 11px; color: var(--text-muted); margin-right: 6px;">ATIVO MT5:</label>
             <select id="assetSelect">
                 <option value="WINV26">WINV26 (Mini Índice)</option>
                 <option value="WDOU26">WDOU26 (Mini Dólar)</option>
@@ -224,240 +135,215 @@
         </div>
     </div>
 
-    <!-- PAINEL CENTRAL DE DECISÃO OBJETIVA (ESTILO ASG) -->
-    <div id="asgPanel" class="asg-main-panel action-wait">
-        <div id="signalBadge" class="badge-wait">Filtro de Ruído Ativo</div>
-        <h2 id="mainVerdict" class="main-verdict">AGUARDANDO CONFLUÊNCIA ESTRUTURAL</h2>
-        <p id="mainContext" class="main-context">O motor ASG está filtrando o book e a agressão em tempo real. Nenhuma entrada é liberada enquanto os 5 filtros de microestrutura não atingirem score mínimo de 8/10.</p>
-        
-        <div class="exec-grid">
-            <div class="exec-card">
-                <span>Direção do Fluxo</span>
-                <strong id="resDirecao" style="color: var(--yellow);">NEUTRO</strong>
-            </div>
-            <div class="exec-card">
-                <span>Gatilho Consolidado</span>
-                <strong id="resGatilho">Filtro de Ruído</strong>
-            </div>
-            <div class="exec-card">
-                <span>Stop Invalidação</span>
-                <strong id="resStop">--</strong>
-            </div>
-            <div class="exec-card">
-                <span>Alvo Técnico</span>
-                <strong id="resAlvo">--</strong>
-            </div>
-        </div>
-    </div>
-
-    <!-- SEÇÃO DE FILTROS E MÉTRICAS CONSOLIDADAS -->
-    <div class="grid-filters">
-        <!-- CHECKLIST DOS 5 FILTROS (CONSOLIDADO) -->
-        <div class="sub-panel">
-            <h3>Consolidado do Sistema de 5 Filtros</h3>
-            <div class="checklist-row">
-                <span>1. Alinhamento com a Região Gráfica Relevante</span>
-                <span id="chk1" class="check-status pending">ANALISANDO</span>
-            </div>
-            <div class="checklist-row">
-                <span>2. Resposta de Agressão Institucional (Delta)</span>
-                <span id="chk2" class="check-status pending">ANALISANDO</span>
-            </div>
-            <div class="checklist-row">
-                <span>3. Ausência de Absorção Contrária na Ponta</span>
-                <span id="chk3" class="check-status pending">ANALISANDO</span>
-            </div>
-            <div class="checklist-row">
-                <span>4. Aceitação de Preço pós-Rompimento/Reteste</span>
-                <span id="chk4" class="check-status pending">ANALISANDO</span>
-            </div>
-            <div class="checklist-row">
-                <span>5. Relação Risco x Retorno Válida (> 1.5)</span>
-                <span id="chk5" class="check-status pending">ANALISANDO</span>
-            </div>
+    <div class="main-grid">
+        <!-- COLUNA ESQUERDA: GRÁFICO EM TEMPO REAL 1 MINUTO (ESTILO PROFITCHART) -->
+        <div class="panel">
+            <h3 id="chartTitle">Gráfico de Cotação M1 &bull; WINV26</h3>
+            <div class="chart-container" id="tradingview_widget"></div>
         </div>
 
-        <!-- MÉTRICAS DE FLUXO AGREGADAS -->
-        <div class="sub-panel">
-            <h3>Métricas de Microestrutura</h3>
-            <div class="metrics-grid" style="margin-bottom: 10px;">
-                <div class="metric-box">
-                    <span>Preço Atual</span>
-                    <strong id="metPreco">--</strong>
-                </div>
-                <div class="metric-box">
-                    <span>Saldo Delta</span>
-                    <strong id="metDelta">--</strong>
+        <!-- COLUNA DIREITA: SINAIS & GERENCIAMENTO DE GAIN/LOSS -->
+        <div>
+            <!-- PAINEL DE DECISÃO -->
+            <div id="decisionBox" class="decision-box wait">
+                <div id="signalBadge" class="signal-badge wait">Aguardando Confluência</div>
+                <h2 id="verdictTitle" class="verdict-title">MONITORANDO MT5</h2>
+                <div id="verdictSub" class="verdict-sub">Aguardando dados de MME e Fluxo...</div>
+
+                <div class="metrics-row">
+                    <div class="metric-card">
+                        <span>Preço Atual</span>
+                        <strong id="mPreco">--</strong>
+                    </div>
+                    <div class="metric-card">
+                        <span>Delta Fluxo</span>
+                        <strong id="mDelta">--</strong>
+                    </div>
+                    <div class="metric-card">
+                        <span>Score Sala</span>
+                        <strong id="mScore">0/3</strong>
+                    </div>
                 </div>
             </div>
-            <div class="metrics-grid">
-                <div class="metric-box">
-                    <span>Volume</span>
-                    <strong id="metVolume">--</strong>
+
+            <!-- GERENCIAMENTO DE ACUMULADO (GAIN / LOSS) -->
+            <div class="panel">
+                <h3>Acumulado da Sessão (Stop Curto / Alvo Longo)</h3>
+                
+                <div class="ledger-grid">
+                    <div class="ledger-box">
+                        <span>Operações</span>
+                        <strong id="accOps">0</strong>
+                    </div>
+                    <div class="ledger-box">
+                        <span>Acerto (Win)</span>
+                        <strong id="accWins" style="color: var(--green);">0</strong>
+                    </div>
+                    <div class="ledger-box">
+                        <span>Erros (Loss)</span>
+                        <strong id="accLosses" style="color: var(--red);">0</strong>
+                    </div>
+                    <div class="ledger-box">
+                        <span>Saldo Pontos</span>
+                        <strong id="accPoints">0 pts</strong>
+                    </div>
                 </div>
-                <div class="metric-box">
-                    <span>Score Final</span>
-                    <strong id="metScore">-- / 10</strong>
+
+                <div class="btn-group">
+                    <button class="btn btn-green" onclick="registrarTrade('GAIN')">+ Registrar Gain (Alvo Longo)</button>
+                    <button class="btn btn-red" onclick="registrarTrade('LOSS')">- Registrar Loss (Stop Curto)</button>
+                    <button class="btn btn-reset" onclick="zerarLedger()">Zerar Estatísticas da Sessão</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="footer-info">
-        <div>Última Sincronização: <span id="lblHora">--:--:--</span></div>
-        <div>Engine: Skaunder Prime ASG v6.2 (Anti-Ruído Ativo)</div>
+        <div>Último Sync MT5: <span id="lblHora">--:--:--</span></div>
+        <div>Estratégia: Stop Curto &bull; Alvo Longo (B3)</div>
     </div>
 </div>
 
+<!-- Script do Widget TradingView (Gráfico M1 / Tempo Real estilo ProfitChart) -->
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    const firebaseConfig = {
-        databaseURL: "https://skaunder-prime-default-rtdb.firebaseio.com"
-    };
+    let tvWidget = null;
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+    function carregarGrafico(ativo) {
+        // Mapeia o ticker do MT5 para o formato compatível com o TradingView (B3)
+        let tvSymbol = "BMF:" + ativo;
+        
+        document.getElementById('chartTitle').innerText = "Gráfico M1 &bull; " + ativo;
+        
+        document.getElementById('tradingview_widget').innerHTML = "";
+        
+        tvWidget = new TradingView.widget({
+            "autosize": true,
+            "symbol": tvSymbol,
+            "interval": "1", // Gráfico de 1 Minuto estilo ProfitChart
+            "timezone": "America/Sao_Paulo",
+            "theme": "dark",
+            "style": "1", // Candlestick
+            "locale": "br",
+            "toolbar_bg": "#161b22",
+            "enable_publishing": false,
+            "hide_top_toolbar": false,
+            "save_image": false,
+            "container_id": "tradingview_widget"
+        });
     }
 
+    // Inicialização Firebase
+    const firebaseConfig = { databaseURL: "https://skaunder-prime-default-rtdb.firebaseio.com" };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let currentRef = null;
 
-    // Elementos DOM
     const connDot = document.getElementById('connDot');
     const assetSelect = document.getElementById('assetSelect');
-    const asgPanel = document.getElementById('asgPanel');
+    const decisionBox = document.getElementById('decisionBox');
     const signalBadge = document.getElementById('signalBadge');
-    const mainVerdict = document.getElementById('mainVerdict');
-    const mainContext = document.getElementById('mainContext');
+    const verdictTitle = document.getElementById('verdictTitle');
+    const verdictSub = document.getElementById('verdictSub');
     
-    const resDirecao = document.getElementById('resDirecao');
-    const resGatilho = document.getElementById('resGatilho');
-    const resStop = document.getElementById('resStop');
-    const resAlvo = document.getElementById('resAlvo');
-
-    const chk1 = document.getElementById('chk1');
-    const chk2 = document.getElementById('chk2');
-    const chk3 = document.getElementById('chk3');
-    const chk4 = document.getElementById('chk4');
-    const chk5 = document.getElementById('chk5');
-
-    const metPreco = document.getElementById('metPreco');
-    const metDelta = document.getElementById('metDelta');
-    const metVolume = document.getElementById('metVolume');
-    const metScore = document.getElementById('metScore');
+    const mPreco = document.getElementById('mPreco');
+    const mDelta = document.getElementById('mDelta');
+    const mScore = document.getElementById('mScore');
     const lblHora = document.getElementById('lblHora');
 
-    function aplicarFiltroASG(data) {
-        let score = Number(data.score) || 5;
-        let preco = Number(data.preco) || 0;
-        let delta = Number(data.delta) || 0;
-        let agressao = data.agressao || "NEUTRO";
-        let evento = data.eventoFluxo || "Monitorando";
+    // Variáveis de Gerenciamento de Gain/Loss
+    let sessionData = { ops: 0, wins: 0, losses: 0, points: 0 };
 
-        // Atualiza métricas brutas filtradas
-        metPreco.innerText = preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-        metDelta.innerText = delta;
-        metDelta.style.color = delta >= 0 ? "var(--green)" : "var(--red)";
-        metVolume.innerText = data.volume || 0;
-        metScore.innerText = score + " / 10";
-        lblHora.innerText = data.hora || '--:--:--';
-
-        // Lógica de Consolidação de Checklist (Filtro ASG)
-        let isAprovado = score >= 8;
-        let isModerado = score >= 6 && score < 8;
-
-        // Simula o preenchimento dos 5 filtros de acordo com o score consolidado
-        setCheck(chk1, score >= 6);
-        setCheck(chk2, Math.abs(delta) > 50);
-        setCheck(chk3, evento.includes("Absorção") || score >= 7);
-        setCheck(chk4, score >= 8);
-        setCheck(chk5, true);
-
-        if (isAprovado) {
-            if (agressao === "COMPRA" || delta >= 0) {
-                asgPanel.className = "asg-main-panel action-buy";
-                signalBadge.className = "badge-badge badge-buy";
-                signalBadge.innerText = "Sinal Consolidado &bull; Compra Autorizada";
-                mainVerdict.innerText = "EXECUTAR COMPRA COM CONFLUÊNCIA";
-                mainVerdict.style.color = "var(--green)";
-                resDirecao.innerText = "COMPRA";
-                resDirecao.style.color = "var(--green)";
-                resGatilho.innerText = evento;
-                resStop.innerText = (preco - 120).toFixed(2) + " pts (Atrás do ajuste)";
-                resAlvo.innerText = (preco + 250).toFixed(2) + " pts (Resistência)";
-            } else {
-                asgPanel.className = "asg-main-panel action-sell";
-                signalBadge.className = "badge-badge badge-sell";
-                signalBadge.innerText = "Sinal Consolidado &bull; Venda Autorizada";
-                mainVerdict.innerText = "EXECUTAR VENDA COM CONFLUÊNCIA";
-                mainVerdict.style.color = "var(--red)";
-                resDirecao.innerText = "VENDA";
-                resDirecao.style.color = "var(--red)";
-                resGatilho.innerText = evento;
-                resStop.innerText = (preco + 120).toFixed(2) + " pts (Atrás do ajuste)";
-                resAlvo.innerText = (preco - 250).toFixed(2) + " pts (Suporte)";
-            }
-            mainContext.innerText = "O motor ASG consolidou o fluxo e validou todos os filtros estatísticos. Alta probabilidade de deslocamento direcional limpo.";
-        } else if (isModerado) {
-            asgPanel.className = "asg-main-panel action-wait";
-            signalBadge.className = "badge-badge badge-wait";
-            signalBadge.innerText = "Cautela &bull; Aguardando Confirmação";
-            mainVerdict.innerText = "AGUARDAR RETESTE / CONSOLIDAÇÃO";
-            mainVerdict.style.color = "var(--yellow)";
-            resDirecao.innerText = "NEUTRO";
-            resDirecao.style.color = "var(--yellow)";
-            resGatilho.innerText = "Leitura intermediária (" + score + "/10)";
-            resStop.innerText = "--";
-            resAlvo.innerText = "--";
-            mainContext.innerText = "O mercado apresenta movimentação, mas sem o score necessário de exaustão ou defesa institucional forte. Evite alavancagem.";
-        } else {
-            asgPanel.className = "asg-main-panel action-wait";
-            signalBadge.className = "badge-badge badge-wait";
-            signalBadge.innerText = "Filtro Ativo &bull; Zona de Ruído";
-            mainVerdict.innerText = "NÃO OPERAR &bull; FILTRANDO RUÍDO";
-            mainVerdict.style.color = "var(--text-muted)";
-            resDirecao.innerText = "FORA";
-            resDirecao.style.color = "var(--text-muted)";
-            resGatilho.innerText = "Mercado travado / Sem direcional";
-            resStop.innerText = "--";
-            resAlvo.innerText = "--";
-            mainContext.innerText = "O motor ASG bloqueou as entradas devido a baixa confluência ou volatilidade sem agressão direcional pura.";
-        }
+    function atualizarLedgerUI() {
+        document.getElementById('accOps').innerText = sessionData.ops;
+        document.getElementById('accWins').innerText = sessionData.wins;
+        document.getElementById('accLosses').innerText = sessionData.losses;
+        
+        let ptsEl = document.getElementById('accPoints');
+        ptsEl.innerText = sessionData.points + " pts";
+        ptsEl.style.color = sessionData.points >= 0 ? "var(--green)" : "var(--red)";
     }
 
-    function setCheck(element, status) {
-        if (status) {
-            element.innerText = "APROVADO";
-            element.className = "check-status ok";
+    function registrarTrade(resultado) {
+        let ativo = assetSelect.value;
+        let isWin = ativo.includes("WIN");
+        let gainPts = isWin ? 450 : 45;
+        let lossPts = isWin ? 150 : 15;
+
+        sessionData.ops++;
+        if (resultado === 'GAIN') {
+            sessionData.wins++;
+            sessionData.points += gainPts;
         } else {
-            element.innerText = "PENDENTE";
-            element.className = "check-status no";
+            sessionData.losses++;
+            sessionData.points -= lossPts;
+        }
+        atualizarLedgerUI();
+    }
+
+    function zerarLedger() {
+        sessionData = { ops: 0, wins: 0, losses: 0, points: 0 };
+        atualizarLedgerUI();
+    }
+
+    function processarDadosMT5(ativo, data) {
+        let preco = Number(data.preco) || 0;
+        let delta = Number(data.delta) || 0;
+        let score = Number(data.score) || 0;
+        let agressao = data.agressao || "NEUTRO";
+
+        mPreco.innerText = preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        mDelta.innerText = delta;
+        mDelta.style.color = delta >= 0 ? "var(--green)" : "var(--red)";
+        mScore.innerText = score + " / 3";
+        lblHora.innerText = data.hora || '--:--:--';
+
+        if (score >= 3 && agressao === "COMPRA") {
+            decisionBox.className = "decision-box buy";
+            signalBadge.className = "signal-badge buy";
+            signalBadge.innerText = "Sinal Aprovado &bull; Compra";
+            verdictTitle.innerText = "ALVO LONGO COMPRADOR";
+            verdictTitle.style.color = "var(--green)";
+            verdictSub.innerText = "MME Alinhada e Fluxo Positivo. Executar Compra.";
+        } else if (score >= 3 && agressao === "VENDA") {
+            decisionBox.className = "decision-box sell";
+            signalBadge.className = "signal-badge sell";
+            signalBadge.innerText = "Sinal Aprovado &bull; Venda";
+            verdictTitle.innerText = "ALVO LONGO VENDEDOR";
+            verdictTitle.style.color = "var(--red)";
+            verdictSub.innerText = "MME Alinhada e Fluxo Negativo. Executar Venda.";
+        } else {
+            decisionBox.className = "decision-box wait";
+            signalBadge.className = "signal-badge wait";
+            signalBadge.innerText = "Aguardando Alinhamento";
+            verdictTitle.innerText = "MERCADO EM CONSOLIDAÇÃO";
+            verdictTitle.style.color = "var(--yellow)";
+            verdictSub.innerText = "Sem confluência estrita de gatilho no momento.";
         }
     }
 
     function monitorarAtivo(ativo) {
         if (currentRef) currentRef.off();
-
         currentRef = db.ref(ativo);
         connDot.className = "status-dot";
         
-        currentRef.on('value', (snapshot) => {
-            const data = snapshot.val();
+        currentRef.on('value', (snap) => {
+            const data = snap.val();
             if (data) {
                 connDot.className = "status-dot online";
-                aplicarFiltroASG(data);
+                processarDadosMT5(ativo, data);
             } else {
                 connDot.className = "status-dot";
-                mainVerdict.innerText = "AGUARDANDO CONEXÃO COM O MT5";
-                mainContext.innerText = "Nenhum dado encontrado para o ativo " + ativo + ". Certifique-se de que o Expert Advisor está ativo no MetaTrader 5.";
+                verdictTitle.innerText = "AGUARDANDO MT5";
+                verdictSub.innerText = "Inicie o Expert Advisor para o ativo " + ativo + ".";
             }
-        }, (error) => {
-            connDot.className = "status-dot";
-            console.error("Erro Firebase:", error);
         });
+
+        carregarGrafico(ativo);
     }
 
+    // Inicialização
     monitorarAtivo(assetSelect.value);
-
     assetSelect.addEventListener('change', (e) => {
         monitorarAtivo(e.target.value);
     });
