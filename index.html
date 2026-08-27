@@ -101,7 +101,6 @@
         .metric-card span { font-size: 9px; color: var(--text-muted); text-transform: uppercase; display: block; }
         .metric-card strong { font-size: 12px; margin-top: 2px; display: block; }
 
-        /* Painel de Execução Simulada (Simula Ordem no MT5) */
         .exec-panel { background: #121820; border: 1px solid var(--accent); border-radius: 6px; padding: 12px; margin-bottom: 12px; }
         .exec-panel h3 { color: var(--accent); border-bottom-color: rgba(88,166,255,0.2); }
         
@@ -112,7 +111,6 @@
         .btn-sell { background: var(--red); }
         .btn-sell:hover { background: #f85149; }
 
-        /* Posição Aberta Ativa */
         .position-box { background: #0d1117; border: 1px dashed var(--border-color); border-radius: 4px; padding: 10px; font-size: 11px; display: none; }
         .position-box.active { display: block; border-color: var(--accent); }
         .pos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
@@ -150,15 +148,12 @@
     </div>
 
     <div class="main-grid">
-        <!-- COLUNA ESQUERDA: GRÁFICO M1 ESTILO PROFITCHART -->
         <div class="panel">
             <h3 id="chartTitle">Gráfico de Cotação M1 &bull; WINV26</h3>
             <div class="chart-container" id="tradingview_widget"></div>
         </div>
 
-        <!-- COLUNA DIREITA: SINAIS, SIMULADOR DE ORDENS E GERENCIAMENTO -->
         <div>
-            <!-- PAINEL DE SINAIS DO MT5 -->
             <div id="decisionBox" class="decision-box wait">
                 <div id="signalBadge" class="signal-badge wait">Aguardando Confluência</div>
                 <h2 id="verdictTitle" class="verdict-title">MONITORANDO MT5</h2>
@@ -180,7 +175,6 @@
                 </div>
             </div>
 
-            <!-- MENU DE SIMULAÇÃO DE COMPRA E VENDA EM TEMPO REAL -->
             <div class="panel exec-panel">
                 <h3>Simulador de Execução (Estilo MetaTrader 5)</h3>
                 
@@ -189,7 +183,6 @@
                     <button class="btn-order btn-sell" onclick="simularOrdem('VENDA')">&#9660; Vender a Mercado</button>
                 </div>
 
-                <!-- Caixa de Posição Ativa -->
                 <div id="positionBox" class="position-box">
                     <div style="font-weight: bold; margin-bottom: 6px; color: var(--accent); display: flex; justify-content: space-between;">
                         <span>POSIÇÃO ABERTA: <span id="posTipo">--</span></span>
@@ -206,7 +199,6 @@
                 </div>
             </div>
 
-            <!-- ACUMULADO DA SESSÃO -->
             <div class="panel">
                 <h3>Acumulado da Sessão (Gain / Loss)</h3>
                 
@@ -285,7 +277,6 @@
     const mScore = document.getElementById('mScore');
     const lblHora = document.getElementById('lblHora');
 
-    // Variáveis do Simulador de Ordens e Acumulado
     let posicao = { ativa: false, tipo: null, precoEntrada: 0, ativo: '' };
     let sessionData = { ops: 0, wins: 0, losses: 0, points: 0 };
 
@@ -347,7 +338,6 @@
 
         atualizarLedgerUI();
 
-        // Reseta posição
         posicao.ativa = false;
         document.getElementById('positionBox').className = "position-box";
     }
@@ -412,7 +402,6 @@
         currentRef = db.ref(ativo);
         connDot.className = "status-dot";
         
-        // Se trocar de ativo e houver posição aberta em outro, fecha ou avisa
         if (posicao.ativa && posicao.ativo !== ativo) {
             fecharPosicaoSimulada();
         }
