@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime | Profit Pro Layout</title>
+    <title>Skaunder Prime | Profit Pro Layout (Ultra Fast)</title>
     <style>
         :root {
             --bg-dark: #12161f;
@@ -123,7 +123,7 @@
 
         /* PLACAR ESTATÍSTICO */
         .score-box { text-align: center; padding: 2px 0; }
-        .score-val { font-size: 34px; font-weight: 800; color: #ffb74d; transition: color 0.3s; }
+        .score-val { font-size: 34px; font-weight: 800; color: #ffb74d; transition: color 0.1s; }
         .score-max { font-size: 14px; color: var(--text-muted); }
         .score-status { margin-top: 2px; font-weight: bold; font-size: 11px; color: #ffb74d; }
 
@@ -141,7 +141,7 @@
             height: 100%;
             width: 54%;
             background: linear-gradient(90deg, var(--red) 0%, var(--green) 100%);
-            transition: width 0.3s ease;
+            transition: width 0.1s ease;
         }
 
         .delta-stats { display: flex; justify-content: space-between; font-weight: bold; font-size: 10px; }
@@ -177,7 +177,7 @@
         .btn-sell-act { background: rgba(242, 54, 69, 0.2); color: var(--red); border: 1px solid var(--red); padding: 8px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .btn-sell-act:hover { background: var(--red); color: #fff; }
 
-        /* CHARTS - PROFIT PRO PATTERN (GRANDE E NO TOPO DIREITO) */
+        /* CHARTS */
         .chart-card {
             background: #131722;
             border: 1px solid var(--border-color);
@@ -313,7 +313,7 @@
             </div>
         </div>
 
-        <!-- COLUNA DIREITA (GRÁFICO GRANDE NO TOPO + TIMES & TRADES ABAIXO) -->
+        <!-- COLUNA DIREITA -->
         <div>
             <div class="chart-card">
                 <div class="chart-header">
@@ -351,9 +351,8 @@
         let tipoAtivoAtual = "WDO";
         let codigoContratoAtual = "WDOU26";
         let precoBase = 5611.12;
-        let ultimoDadoFirebaseRecebido = 0;
         let historicoCandles = [];
-        let contadorSegundosCandle = 0;
+        let contadorMilisegundosCandle = 0;
 
         function getQuartaMaisProximaDoDia15(ano, mesIndex) {
             const d15 = new Date(ano, mesIndex, 15);
@@ -416,7 +415,7 @@
             const selectEl = document.getElementById('assetSelect');
             codigoContratoAtual = selectEl.value;
             tipoAtivoAtual = codigoContratoAtual.startsWith('WIN') ? 'WIN' : 'WDO';
-            contadorSegundosCandle = 0;
+            contadorMilisegundosCandle = 0;
             
             document.getElementById('chartSymbol').innerText = codigoContratoAtual;
             document.getElementById('ttTitle').innerText = `TIMES & TRADES - AGRESSÕES ${codigoContratoAtual}`;
@@ -584,7 +583,7 @@
                     ultimo.close = precoBase;
                     if (precoBase > ultimo.high) ultimo.high = precoBase;
                     if (precoBase < ultimo.low) ultimo.low = precoBase;
-                    ultimo.vol += Math.floor(10 + Math.random() * 50);
+                    ultimo.vol += Math.floor(5 + Math.random() * 25);
                     desenharGraficoProfitPro();
                 }
             }
@@ -659,12 +658,16 @@
             }
         }
 
+        // TICKER OTIMIZADO DE ALTA VELOCIDADE (SEM TRAVAS E COM INTERVALO DE 200MS)
         function iniciarTickerDinamico() {
+            let intervaloSimulacao = 200; // Atualizações ultra-rápidas (4x por segundo)
+            
             setInterval(() => {
-                // Atualização temporal exata para ciclos de 10 segundos nos candles
-                contadorSegundosCandle++;
-                if (contadorSegundosCandle >= 10) {
-                    contadorSegundosCandle = 0;
+                contadorMilisegundosCandle += intervaloSimulacao;
+                
+                // Fechamento exato do candle de 10 segundos (10000ms)
+                if (contadorMilisegundosCandle >= 10000) {
+                    contadorMilisegundosCandle = 0;
                     if (historicoCandles.length > 30) historicoCandles.shift();
                     let ultimoFechamento = historicoCandles[historicoCandles.length - 1].close;
                     historicoCandles.push({
@@ -672,14 +675,12 @@
                         high: ultimoFechamento,
                         low: ultimoFechamento,
                         close: ultimoFechamento,
-                        vol: Math.floor(50 + Math.random() * 150)
+                        vol: Math.floor(20 + Math.random() * 80)
                     });
                 }
 
-                if (Date.now() - ultimoDadoFirebaseRecebido < 3000) return;
-
                 const step = tipoAtivoAtual === 'WDO' ? 0.25 : 25;
-                const variacao = (Math.random() - 0.48) * step * 2;
+                const variacao = (Math.random() - 0.48) * step * 1.5;
                 precoBase += variacao;
 
                 const deltaSim = Math.floor((Math.random() * 320) - 150);
@@ -690,7 +691,7 @@
                 const playersList = ['Goldman Sachs', 'UBS', 'XP Investimentos', 'Morgan Stanley', 'BTG Pactual', 'Clear Corretora', 'Genial'];
                 const playerRand = playersList[Math.floor(Math.random() * playersList.length)];
                 const agrRand = Math.random() > 0.46 ? 'COMPRA' : 'VENDA';
-                const volRand = Math.floor(5 + Math.random() * 95);
+                const volRand = Math.floor(5 + Math.random() * 50);
 
                 const dadosTick = {
                     preco: precoBase,
@@ -709,7 +710,7 @@
                 };
 
                 atualizarInterfaceComDados(dadosTick);
-            }, 1000);
+            }, intervaloSimulacao);
         }
 
         window.onload = () => {
@@ -732,10 +733,10 @@
             const database = firebase.database();
             const cotacaoRef = database.ref('cotacao');
 
+            // CONEXÃO EM TEMPO REAL IMEDIATA (SEM BLOQUEIOS OU TRAVAS DE LATÊNCIA)
             cotacaoRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    ultimoDadoFirebaseRecebido = Date.now();
                     document.getElementById('statusConnection').innerText = "🟢 AO VIVO (MT5 CONECTADO)";
                     atualizarInterfaceComDados(data);
                 }
@@ -743,7 +744,7 @@
                 document.getElementById('statusConnection').innerText = "🟡 MODO SIMULAÇÃO ATIVA";
             });
         } catch (e) {
-            console.log("Executando em modo de simulação autônoma.");
+            console.log("Executando em modo de simulação autônoma de alta velocidade.");
         }
     </script>
 </body>
