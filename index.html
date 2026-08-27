@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime | Pregão B3</title>
+    <title>Skaunder Prime | Pregão B3 Ao Vivo</title>
     <style>
         :root {
             --bg-dark: #0b0e14;
@@ -49,34 +49,12 @@
         }
 
         .brand h1 { font-size: 18px; letter-spacing: 1px; color: #fff; font-weight: 800; }
-        .brand-sub { font-size: 11px; color: var(--yellow); font-weight: bold; display: flex; align-items: center; gap: 4px; }
+        .brand-sub { font-size: 11px; color: var(--red); font-weight: bold; display: flex; align-items: center; gap: 4px; }
 
         .header-controls {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .mode-select {
-            background: #1c2128;
-            color: #fff;
-            border: 1px solid var(--yellow);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .date-picker {
-            background: #0d1117;
-            border: 1px solid var(--border-color);
-            color: var(--blue);
-            padding: 5px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            color-scheme: dark;
         }
 
         .badge-live {
@@ -110,28 +88,6 @@
             border: 1px solid var(--border-color);
         }
 
-        .btn-ctrl {
-            background: var(--orange);
-            color: #000;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 11px;
-            cursor: pointer;
-        }
-
-        .btn-ctrl-secondary {
-            background: #21262d;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 11px;
-            cursor: pointer;
-        }
-
         .asset-select {
             background: #0d1117;
             color: #fff;
@@ -140,6 +96,7 @@
             border-radius: 6px;
             font-size: 12px;
             font-weight: bold;
+            cursor: pointer;
         }
 
         /* GRID */
@@ -222,41 +179,26 @@
         .btn-sell-act { background: rgba(255, 82, 82, 0.15); color: var(--red); border: 1px solid var(--red); padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-sell-act:hover { background: var(--red); color: #fff; }
 
-        /* CHARTS & GATILHO */
+        /* CHARTS (REDUZIDO) */
         .chart-card {
             background: #0d1117;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 12px;
+            padding: 10px;
             margin-bottom: 14px;
         }
 
-        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .chart-title { font-size: 13px; font-weight: bold; color: #fff; display: flex; gap: 8px; align-items: center; }
-        .chart-badge { background: rgba(41, 182, 246, 0.2); color: var(--blue); padding: 3px 6px; border-radius: 4px; font-size: 10px; }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .chart-title { font-size: 12px; font-weight: bold; color: #fff; display: flex; gap: 8px; align-items: center; }
+        .chart-badge { background: rgba(255, 82, 82, 0.2); color: var(--red); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
 
         canvas#candleChart {
             width: 100%;
-            height: 250px;
+            height: 150px;
             display: block;
             background: #080b10;
             border-radius: 6px;
             border: 1px solid var(--border-color);
-        }
-
-        .trigger-box {
-            background: rgba(0, 230, 118, 0.1);
-            border: 1.5px solid var(--green);
-            box-shadow: 0 0 10px var(--green-glow);
-            padding: 14px 18px;
-            border-radius: 8px;
-            color: var(--green);
-            font-size: 14px;
-            font-weight: 800;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         /* TIMES & TRADES */
@@ -280,33 +222,17 @@
     <div class="header">
         <div class="brand">
             <h1>SKAUNDER PRIME</h1>
-            <div id="brandSub" class="brand-sub">🟨 REPLAY DE PREGÃO</div>
+            <div id="brandSub" class="brand-sub">🔴 PREGÃO AO VIVO (B3)</div>
         </div>
 
         <div class="header-controls">
-            <!-- SELETOR DE MODO -->
-            <select id="modeSelect" class="mode-select" onchange="trocarModo()">
-                <option value="replay">🟨 Replay de Pregão</option>
-                <option value="live">🔴 Pregão AO VIVO (Live)</option>
-            </select>
-
-            <!-- CONTROLES REPLAY -->
-            <div id="replayControls" style="display: flex; align-items: center; gap: 8px;">
-                <input type="date" id="replayDate" class="date-picker" value="2026-08-12" onchange="alterarDataReplay()">
-                <button class="btn-ctrl" id="btnPause" onclick="togglePause()">⏸ PAUSE</button>
-                <button class="btn-ctrl-secondary" onclick="resetReplay()">🔄 RESET</button>
-            </div>
-
-            <!-- STATUS LIVE -->
-            <div id="liveControls" style="display: none; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="badge-live">🔴 MERCADO REAL B3</span>
             </div>
-
             <span class="time-display" id="clockDisplay">10:02:20</span>
         </div>
 
         <div>
-            <!-- SELETOR DE ATIVOS B3 (VIGENTES CALCULADOS DINAMICAMENTE) -->
             <select id="assetSelect" class="asset-select" onchange="trocarAtivoInstantaneo()">
                 <option value="WDO" id="optWDO">WDO (Mini Dólar)</option>
                 <option value="WIN" id="optWIN">WIN (Mini Índice)</option>
@@ -370,17 +296,13 @@
                 <div class="chart-header">
                     <div class="chart-title">
                         <span id="chartSymbol">WDOU26</span>
-                        <span id="chartBadge" class="chart-badge">1 MINUTO (REPLAY TICK)</span>
+                        <span id="chartBadge" class="chart-badge">1 MINUTO (AO VIVO)</span>
                     </div>
                     <div style="font-size: 11px; color: var(--text-muted);">
                         PREÇO ATUAL: <b id="chartLastPrice" style="color: #fff;">5611.12</b>
                     </div>
                 </div>
-                <canvas id="candleChart" width="800" height="250"></canvas>
-            </div>
-
-            <div id="triggerBox" class="trigger-box">
-                ⚡ <span id="triggerMsg">GATILHO EXATO DE COMPRA ATIVO - WDOU26 @ 5610.12</span>
+                <canvas id="candleChart" width="800" height="150"></canvas>
             </div>
 
             <div class="card" style="margin-bottom: 0;">
@@ -398,60 +320,26 @@
         let tipoAtivoAtual = "WDO";
         let codigoContratoAtual = "WDOU26";
         let precoBase = 5611.12;
-        let emPausa = false;
+        let historicoCandles = [
+            { open: 5612, high: 5614, low: 5611, close: 5613 },
+            { open: 5613, high: 5613.5, low: 5610, close: 5611 },
+            { open: 5611, high: 5615, low: 5611, close: 5614 },
+            { open: 5614, high: 5617, low: 5614, close: 5616 },
+            { open: 5616, high: 5618, low: 5615, close: 5617 },
+            { open: 5617, high: 5617.5, low: 5613, close: 5614 },
+            { open: 5614, high: 5615, low: 5611, close: 5612 },
+            { open: 5612, high: 5613, low: 5609, close: 5610 },
+            { open: 5610, high: 5612, low: 5609.5, close: 5611.12 }
+        ];
 
-        function trocarModo() {
-            const modo = document.getElementById('modeSelect').value;
-            const replayControls = document.getElementById('replayControls');
-            const liveControls = document.getElementById('liveControls');
-            const brandSub = document.getElementById('brandSub');
-            const chartBadge = document.getElementById('chartBadge');
-
-            if (modo === 'live') {
-                replayControls.style.display = 'none';
-                liveControls.style.display = 'flex';
-                brandSub.innerHTML = '🔴 PREGÃO AO VIVO';
-                brandSub.style.color = 'var(--red)';
-                chartBadge.innerText = '1 MINUTO (MERCADO REAL B3)';
-                chartBadge.style.background = 'rgba(255, 82, 82, 0.2)';
-                chartBadge.style.color = 'var(--red)';
-            } else {
-                replayControls.style.display = 'flex';
-                liveControls.style.display = 'none';
-                brandSub.innerHTML = '🟨 REPLAY DE PREGÃO';
-                brandSub.style.color = 'var(--yellow)';
-                chartBadge.innerText = '1 MINUTO (REPLAY TICK)';
-                chartBadge.style.background = 'rgba(41, 182, 246, 0.2)';
-                chartBadge.style.color = 'var(--blue)';
-            }
-        }
-
-        function alterarDataReplay() {
-            const dataSelecionada = document.getElementById('replayDate').value;
-            const dataFormatada = dataSelecionada.split('-').reverse().join('/');
-            alert(`Carregando dados de Replay do dia: ${dataFormatada}`);
-        }
-
-        function togglePause() {
-            emPausa = !emPausa;
-            document.getElementById('btnPause').innerText = emPausa ? '▶ PLAY' : '⏸ PAUSE';
-        }
-
-        function resetReplay() {
-            alert('Replay reiniciado para o tempo 10:00:00');
-            document.getElementById('clockDisplay').innerText = '10:00:00';
-        }
-
-        // Função que calcula a quarta-feira mais próxima do dia 15 (Regra Oficial B3 para o Mini Índice - WIN)
         function getQuartaMaisProximaDoDia15(ano, mesIndex) {
             const d15 = new Date(ano, mesIndex, 15);
-            const diaSemana = d15.getDay(); // 0: Dom, 1: Seg, 2: Ter, 3: Qua, 4: Qui, 5: Sex, 6: Sáb
+            const diaSemana = d15.getDay();
             let diff = 3 - diaSemana;
             let diaVenc = 15 + diff;
             return new Date(ano, mesIndex, diaVenc);
         }
 
-        // Obtém o contrato vigente exato da B3
         function obterContratoVigente(ativo) {
             const hoje = new Date();
             const hojeClean = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
@@ -459,14 +347,12 @@
             const letras = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z'];
 
             if (ativo === 'WDO') {
-                // Mini Dólar: vencimento mensal. No decorrer do mês atual, o contrato ativo é o do mês seguinte.
                 let mesVenc = hoje.getMonth() + 1;
                 if (mesVenc > 11) { mesVenc = 0; ano++; }
                 return `WDO${letras[mesVenc]}${ano.toString().slice(-2)}`;
             }
 
             if (ativo === 'WIN') {
-                // Mini Índice: vencimento bimestral nos meses pares (Fev, Abr, Jun, Ago, Out, Dez)
                 const mesesPares = [1, 3, 5, 7, 9, 11];
                 let contratos = [];
 
@@ -481,8 +367,6 @@
                 });
 
                 contratos.sort((a, b) => a.data - b.data);
-
-                // O contrato vigente é o primeiro cujo vencimento seja hoje ou no futuro
                 let ativoEncontrado = contratos.find(c => {
                     const vencClean = new Date(c.data.getFullYear(), c.data.getMonth(), c.data.getDate());
                     return hojeClean <= vencClean;
@@ -492,7 +376,6 @@
             }
         }
 
-        // Atualiza dinamicamente as opções do menu de ativos com os códigos vigentes corretos
         function atualizarOpcoesSelect() {
             const contratoWDO = obterContratoVigente('WDO');
             const contratoWIN = obterContratoVigente('WIN');
@@ -521,38 +404,32 @@
 
         function desenharGraficoSimulado() {
             const canvas = document.getElementById('candleChart');
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
             const w = canvas.width;
             const h = canvas.height;
 
             ctx.clearRect(0, 0, w, h);
 
-            const dummyCandles = [
-                { open: 5612, high: 5614, low: 5611, close: 5613 },
-                { open: 5613, high: 5613.5, low: 5610, close: 5611 },
-                { open: 5611, high: 5615, low: 5611, close: 5614 },
-                { open: 5614, high: 5617, low: 5614, close: 5616 },
-                { open: 5616, high: 5618, low: 5615, close: 5617 },
-                { open: 5617, high: 5617.5, low: 5613, close: 5614 },
-                { open: 5614, high: 5615, low: 5611, close: 5612 },
-                { open: 5612, high: 5613, low: 5609, close: 5610 },
-                { open: 5610, high: 5612, low: 5609.5, close: 5611.12 }
-            ];
-
-            const count = dummyCandles.length;
+            const count = historicoCandles.length;
+            if (count === 0) return;
             const candleWidth = (w - 60) / count;
             const bodyWidth = candleWidth * 0.6;
-            const minP = 5608, maxP = 5620, range = maxP - minP;
 
-            dummyCandles.forEach((c, i) => {
+            let minP = Math.min(...historicoCandles.map(c => c.low));
+            let maxP = Math.max(...historicoCandles.map(c => c.high));
+            if (minP === maxP) { minP -= 1; maxP += 1; }
+            const range = maxP - minP;
+
+            historicoCandles.forEach((c, i) => {
                 const x = i * candleWidth + 30;
                 const isGreen = c.close >= c.open;
                 const color = isGreen ? '#00e676' : '#ff5252';
 
-                const yHigh = h - 20 - ((c.high - minP) / range) * (h - 40);
-                const yLow = h - 20 - ((c.low - minP) / range) * (h - 40);
-                const yOpen = h - 20 - ((c.open - minP) / range) * (h - 40);
-                const yClose = h - 20 - ((c.close - minP) / range) * (h - 40);
+                const yHigh = h - 15 - ((c.high - minP) / range) * (h - 30);
+                const yLow = h - 15 - ((c.low - minP) / range) * (h - 30);
+                const yOpen = h - 15 - ((c.open - minP) / range) * (h - 30);
+                const yClose = h - 15 - ((c.close - minP) / range) * (h - 30);
 
                 ctx.strokeStyle = color;
                 ctx.lineWidth = 1.5;
@@ -563,7 +440,7 @@
 
                 ctx.fillStyle = color;
                 const bodyY = Math.min(yOpen, yClose);
-                const bodyH = Math.max(3, Math.abs(yOpen - yClose));
+                const bodyH = Math.max(2, Math.abs(yOpen - yClose));
                 ctx.fillRect(x, bodyY, bodyWidth, bodyH);
             });
         }
@@ -579,7 +456,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-    <!-- INTEGRADOR MT5 -> FIREBASE -> PAINEL WEB -->
+    <!-- INTEGRADOR MT5 -> FIREBASE -> PAINEL WEB EM TEMPO REAL -->
     <script>
         const firebaseConfig = {
             databaseURL: "https://skaunder-prime-default-rtdb.firebaseio.com"
@@ -592,45 +469,94 @@
         cotacaoRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                if (document.getElementById('modeSelect').value === 'live') {
-                    if (data.preco !== undefined) {
-                        const precoNum = Number(data.preco);
-                        document.getElementById('chartLastPrice').innerText = precoNum.toFixed(2);
-                        precoBase = precoNum;
+                // Atualização de Preço e Horário
+                if (data.preco !== undefined) {
+                    const precoNum = Number(data.preco);
+                    document.getElementById('chartLastPrice').innerText = precoNum.toFixed(2);
+                    precoBase = precoNum;
+
+                    // Atualiza o último candle em tempo real
+                    if (historicoCandles.length > 0) {
+                        let ultimo = historicoCandles[historicoCandles.length - 1];
+                        ultimo.close = precoNum;
+                        if (precoNum > ultimo.high) ultimo.high = precoNum;
+                        if (precoNum < ultimo.low) ultimo.low = precoNum;
+                        desenharGraficoSimulado();
                     }
-                    if (data.hora) document.getElementById('clockDisplay').innerText = data.hora;
+                }
+
+                if (data.hora) {
+                    document.getElementById('clockDisplay').innerText = data.hora;
+                }
+
+                if (data.ativo) {
+                    document.getElementById('chartSymbol').innerText = data.ativo;
+                }
+
+                // 1. Micro Contexto - Agressão Instantânea & Delta
+                if (data.delta !== undefined) {
+                    const deltaVal = Number(data.delta);
+                    const deltaEl = document.getElementById('deltaVal');
+                    deltaEl.innerText = `Delta: ${deltaVal > 0 ? '+' : ''}${deltaVal}`;
+                    deltaEl.style.color = deltaVal >= 0 ? 'var(--green)' : 'var(--red)';
+                }
+
+                if (data.buyRatio !== undefined && data.sellRatio !== undefined) {
+                    const bRatio = Number(data.buyRatio);
+                    const sRatio = Number(data.sellRatio);
+                    document.getElementById('buyRatioLabel').innerText = `BUY ${bRatio}% / SELL ${sRatio}%`;
+                    document.getElementById('deltaBar').style.width = `${bRatio}%`;
+                }
+
+                // 2. Placar Estatístico Skaunder
+                if (data.score !== undefined) {
+                    const scoreNum = Number(data.score).toFixed(1);
+                    document.getElementById('scoreVal').innerText = scoreNum;
+                }
+                if (data.scoreStatus) {
+                    document.getElementById('scoreStatus').innerText = data.scoreStatus;
+                }
+
+                // 3. Fluxo Acumulado de Players
+                if (data.estrangeiros !== undefined) {
+                    const est = Number(data.estrangeiros);
+                    const el = document.getElementById('valEstrangeiros');
+                    el.className = est >= 0 ? 'player-val-buy' : 'player-val-sell';
+                    el.innerHTML = `${est >= 0 ? '+' : ''}R$ ${est.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${est >= 0 ? 'COMPRA' : 'VENDA'})</small>`;
+                }
+                if (data.institucional !== undefined) {
+                    const inst = Number(data.institucional);
+                    const el = document.getElementById('valInstitucional');
+                    el.className = inst >= 0 ? 'player-val-buy' : 'player-val-sell';
+                    el.innerHTML = `${inst >= 0 ? '+' : ''}R$ ${inst.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${inst >= 0 ? 'DEFESA' : 'SAÍDA'})</small>`;
+                }
+                if (data.varejo !== undefined) {
+                    const varVal = Number(data.varejo);
+                    const el = document.getElementById('valVarejo');
+                    el.className = varVal >= 0 ? 'player-val-buy' : 'player-val-sell';
+                    el.innerHTML = `${varVal >= 0 ? '+' : ''}R$ ${varVal.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${varVal >= 0 ? 'COMPRA' : 'VENDA'})</small>`;
+                }
+                if (data.veredicto) {
+                    document.getElementById('veredictoBox').innerText = data.veredicto;
+                }
+
+                // 4. Times & Trades Stream
+                if (data.agressao && data.volume) {
+                    const stream = document.getElementById('ttStream');
+                    const isBuy = data.agressao === 'COMPRA';
+                    const novaLinha = document.createElement('div');
+                    novaLinha.className = 'tt-row';
+                    novaLinha.innerHTML = `
+                        <span><b>${data.player || 'B3 Stream'}</b></span>
+                        <span class="${isBuy ? 'tt-buy' : 'tt-sell'}">
+                            ${data.volume} cont @ ${Number(data.preco).toFixed(2)} (${data.agressao})
+                        </span>
+                    `;
+                    stream.insertBefore(novaLinha, stream.firstChild);
                     
-                    if (data.ativo) {
-                        document.getElementById('chartSymbol').innerText = data.ativo;
+                    if (stream.children.length > 15) {
+                        stream.removeChild(stream.lastChild);
                     }
-
-                    if (data.delta !== undefined) {
-                        const deltaVal = Number(data.delta);
-                        const deltaEl = document.getElementById('deltaVal');
-                        deltaEl.innerText = `Delta: ${deltaVal > 0 ? '+' : ''}${deltaVal}`;
-                        deltaEl.style.color = deltaVal >= 0 ? 'var(--green)' : 'var(--red)';
-                    }
-
-                    if (data.agressao && data.volume) {
-                        const stream = document.getElementById('ttStream');
-                        const isBuy = data.agressao === 'COMPRA';
-                        const novaLinha = document.createElement('div');
-                        novaLinha.className = 'tt-row';
-                        novaLinha.innerHTML = `
-                            <span><b>B3 Stream</b></span>
-                            <span class="${isBuy ? 'tt-buy' : 'tt-sell'}">
-                                ${data.volume} cont @ ${Number(data.preco).toFixed(2)} (${data.agressao})
-                            </span>
-                        `;
-                        stream.insertBefore(novaLinha, stream.firstChild);
-                        
-                        if (stream.children.length > 15) {
-                            stream.removeChild(stream.lastChild);
-                        }
-                    }
-
-                    document.getElementById('triggerMsg').innerText = 
-                        `GATILHO ATIVO (${data.agressao || 'FLOW'}) - ${data.ativo} @ ${Number(data.preco).toFixed(2)}`;
                 }
             }
         });
