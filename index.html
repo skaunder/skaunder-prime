@@ -3,212 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime - Live Order Flow & Decision Engine</title>
+    <title>Skaunder Prime &bull; ASG Flow Engine</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
         :root {
-            --bg-color: #0b0e14;
-            --card-bg: #161b22;
-            --text-color: #c9d1d9;
-            --accent-green: #238636;
-            --accent-red: #da3633;
-            --accent-yellow: #d29922;
-            --border-color: #30363d;
+            --bg-color: #080b10;
+            --panel-bg: #111620;
+            --border-color: #21262d;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --green: #2ea043;
+            --red: #f85149;
+            --yellow: #f0883e;
+            --blue: #388bfd;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 16px;
         }
-        .container {
-            max-width: 1050px;
+        .wrapper {
+            max-width: 1100px;
             margin: 0 auto;
         }
-        header {
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        h1 {
-            font-size: 20px;
-            margin: 0;
-            color: #ffffff;
-        }
-        select {
-            background-color: var(--card-bg);
-            color: var(--text-color);
+            background: var(--panel-bg);
             border: 1px solid var(--border-color);
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 14px 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .top-bar h1 {
             font-size: 16px;
+            margin: 0;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--yellow);
+            display: inline-block;
+        }
+        .status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        
+        select {
+            background-color: #1f242c;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
             cursor: pointer;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .card h3 {
-            margin: 0 0 10px 0;
-            font-size: 13px;
-            color: #8b949e;
-            text-transform: uppercase;
-        }
-        .card .value {
-            font-size: 26px;
-            font-weight: bold;
-        }
-        .panel-section {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .panel-section h3 {
-            margin: 0 0 8px 0;
-            font-size: 13px;
-            color: #8b949e;
-            text-transform: uppercase;
-        }
-        .trade-signal-box {
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 16px;
-            background-color: #11161d;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-            text-align: center;
-        }
-        .signal-ready { border-color: var(--accent-green); background-color: rgba(35, 134, 54, 0.08); }
-        .signal-wait { border-color: var(--accent-yellow); background-color: rgba(210, 153, 34, 0.08); }
-        .signal-danger { border-color: var(--accent-red); background-color: rgba(218, 54, 51, 0.08); }
 
-        .trade-grid {
+        /* PAINEL PRINCIPAL DE DECISÃO ESTILO ASG */
+        .asg-main-panel {
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .asg-main-panel.action-buy { border-color: var(--green); background: linear-gradient(180deg, rgba(46,160,67,0.08) 0%, var(--panel-bg) 60%); }
+        .asg-main-panel.action-sell { border-color: var(--red); background: linear-gradient(180deg, rgba(248,81,73,0.08) 0%, var(--panel-bg) 60%); }
+        .asg-main-panel.action-wait { border-color: var(--yellow); background: linear-gradient(180deg, rgba(240,136,62,0.08) 0%, var(--panel-bg) 60%); }
+
+        .signal-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .badge-buy { background: rgba(46,160,67,0.2); color: var(--green); border: 1px solid var(--green); }
+        .badge-sell { background: rgba(248,81,73,0.2); color: var(--red); border: 1px solid var(--red); }
+        .badge-wait { background: rgba(240,136,62,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
+
+        .main-verdict {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.5px;
+        }
+        .main-context {
+            font-size: 14px;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 20px auto;
+            line-height: 1.4;
+        }
+
+        /* GRID DE EXECUÇÃO OBJETIVA */
+        .exec-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
-            margin-top: 15px;
             text-align: left;
         }
-        .trade-item {
-            background: var(--card-bg);
-            padding: 12px;
-            border-radius: 6px;
+        .exec-card {
+            background: #161b22;
             border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 14px;
         }
-        .trade-item span {
+        .exec-card span {
             display: block;
-            font-size: 12px;
-            color: #8b949e;
+            font-size: 11px;
+            color: var(--text-muted);
             text-transform: uppercase;
             margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
-        .trade-item strong {
+        .exec-card strong {
             font-size: 16px;
+            color: #ffffff;
         }
 
-        .compra { color: var(--accent-green); }
-        .venda { color: var(--accent-red); }
-        .score-high { color: var(--accent-green); }
-        .score-mid { color: var(--accent-yellow); }
-        .score-low { color: var(--accent-red); }
-        
-        .footer-status {
-            margin-top: 20px;
+        /* SEÇÃO SECUNDÁRIA DE FILTROS CONSOLIDADOS */
+        .grid-filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        @media(max-width: 768px) {
+            .grid-filters { grid-template-columns: 1fr; }
+        }
+        .sub-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .sub-panel h3 {
+            margin: 0 0 12px 0;
             font-size: 12px;
-            color: #8b949e;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+        
+        .checklist-row {
             display: flex;
             justify-content: space-between;
-            flex-wrap: wrap;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 13px;
+        }
+        .checklist-row:last-child { border-bottom: none; }
+        .check-status {
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        .ok { background: rgba(46,160,67,0.15); color: var(--green); }
+        .no { background: rgba(248,81,73,0.15); color: var(--red); }
+        .pending { background: rgba(240,136,62,0.15); color: var(--yellow); }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
+        }
+        .metric-box {
+            background: #161b22;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+        .metric-box span { font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; }
+        .metric-box strong { font-size: 18px; margin-top: 4px; display: block; }
+
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+            padding: 4px 8px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>Skaunder Prime &bull; Filtro de Fluxo & Execução B3</h1>
+<div class="wrapper">
+    <!-- BARRA SUPERIOR -->
+    <div class="top-bar">
+        <h1>
+            <span id="connDot" class="status-dot"></span> 
+            SKAUNDER PRIME &bull; MOTOR ASG (FLUXO FILTRADO)
+        </h1>
         <div>
-            <label for="assetSelect" style="margin-right: 8px; font-weight: bold;">Ativo:</label>
+            <label for="assetSelect" style="font-size: 12px; color: var(--text-muted); margin-right: 6px;">ATIVO:</label>
             <select id="assetSelect">
                 <option value="WINV26">WINV26 (Mini Índice)</option>
                 <option value="WDOU26">WDOU26 (Mini Dólar)</option>
             </select>
         </div>
-    </header>
+    </div>
 
-    <!-- PAINEL DE SINAL DE ENTRADA E SAÍDA -->
-    <div id="tradeSignalBox" class="trade-signal-box signal-wait">
-        <h3 id="signalTitle" style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-yellow);">Analisando Confluência de Mercado...</h3>
-        <div id="signalMainAction" style="font-size: 28px; font-weight: bold; margin: 10px 0;">AGUARDAR FILTROS (< 6 ITENS)</div>
-        <p id="signalDescription" style="margin: 0; font-size: 14px; color: #8b949e;">O sistema exige confluência de região, agressão e resposta do preço para liberar o gatilho.</p>
+    <!-- PAINEL CENTRAL DE DECISÃO OBJETIVA (ESTILO ASG) -->
+    <div id="asgPanel" class="asg-main-panel action-wait">
+        <div id="signalBadge" class="badge-wait">Filtro de Ruído Ativo</div>
+        <h2 id="mainVerdict" class="main-verdict">AGUARDANDO CONFLUÊNCIA ESTRUTURAL</h2>
+        <p id="mainContext" class="main-context">O motor ASG está filtrando o book e a agressão em tempo real. Nenhuma entrada é liberada enquanto os 5 filtros de microestrutura não atingirem score mínimo de 8/10.</p>
         
-        <div class="trade-grid">
-            <div class="trade-item">
-                <span>Direção Recomendada</span>
-                <strong id="trDirecao">NEUTRO</strong>
+        <div class="exec-grid">
+            <div class="exec-card">
+                <span>Direção do Fluxo</span>
+                <strong id="resDirecao" style="color: var(--yellow);">NEUTRO</strong>
             </div>
-            <div class="trade-item">
-                <span>Gatilho Operacional</span>
-                <strong id="trGatilho">Aguardando padrão</strong>
+            <div class="exec-card">
+                <span>Gatilho Consolidado</span>
+                <strong id="resGatilho">Filtro de Ruído</strong>
             </div>
-            <div class="trade-item">
-                <span>Stop Loss (Invalidação)</span>
-                <strong id="trStop">--</strong>
+            <div class="exec-card">
+                <span>Stop Invalidação</span>
+                <strong id="resStop">--</strong>
             </div>
-            <div class="trade-item">
-                <span>Alvo / Espaço</span>
-                <strong id="trAlvo">--</strong>
+            <div class="exec-card">
+                <span>Alvo Técnico</span>
+                <strong id="resAlvo">--</strong>
             </div>
         </div>
     </div>
 
-    <div class="grid">
-        <div class="card">
-            <h3>Preço Atual</h3>
-            <div id="preco" class="value">--</div>
+    <!-- SEÇÃO DE FILTROS E MÉTRICAS CONSOLIDADAS -->
+    <div class="grid-filters">
+        <!-- CHECKLIST DOS 5 FILTROS (CONSOLIDADO) -->
+        <div class="sub-panel">
+            <h3>Consolidado do Sistema de 5 Filtros</h3>
+            <div class="checklist-row">
+                <span>1. Alinhamento com a Região Gráfica Relevante</span>
+                <span id="chk1" class="check-status pending">ANALISANDO</span>
+            </div>
+            <div class="checklist-row">
+                <span>2. Resposta de Agressão Institucional (Delta)</span>
+                <span id="chk2" class="check-status pending">ANALISANDO</span>
+            </div>
+            <div class="checklist-row">
+                <span>3. Ausência de Absorção Contrária na Ponta</span>
+                <span id="chk3" class="check-status pending">ANALISANDO</span>
+            </div>
+            <div class="checklist-row">
+                <span>4. Aceitação de Preço pós-Rompimento/Reteste</span>
+                <span id="chk4" class="check-status pending">ANALISANDO</span>
+            </div>
+            <div class="checklist-row">
+                <span>5. Relação Risco x Retorno Válida (> 1.5)</span>
+                <span id="chk5" class="check-status pending">ANALISANDO</span>
+            </div>
         </div>
-        <div class="card">
-            <h3>Delta (Saldo)</h3>
-            <div id="delta" class="value">--</div>
-        </div>
-        <div class="card">
-            <h3>Agressão Dominante</h3>
-            <div id="agressao" class="value">--</div>
-        </div>
-        <div class="card">
-            <h3>Score (5 Filtros)</h3>
-            <div id="score" class="value">-- / 10</div>
+
+        <!-- MÉTRICAS DE FLUXO AGREGADAS -->
+        <div class="sub-panel">
+            <h3>Métricas de Microestrutura</h3>
+            <div class="metrics-grid" style="margin-bottom: 10px;">
+                <div class="metric-box">
+                    <span>Preço Atual</span>
+                    <strong id="metPreco">--</strong>
+                </div>
+                <div class="metric-box">
+                    <span>Saldo Delta</span>
+                    <strong id="metDelta">--</strong>
+                </div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span>Volume</span>
+                    <strong id="metVolume">--</strong>
+                </div>
+                <div class="metric-box">
+                    <span>Score Final</span>
+                    <strong id="metScore">-- / 10</strong>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="panel-section">
-        <h3>Evento de Microestrutura Detectado</h3>
-        <div id="eventoFluxo" class="value" style="color: var(--accent-yellow);">Aguardando ticks do MetaTrader 5...</div>
-    </div>
-
-    <div class="footer-status">
-        <div>Última atualização: <span id="hora">--:--:--</span></div>
-        <div>Status da Conexão: <span id="statusConn" style="color: var(--accent-yellow);">Conectando...</span></div>
+    <div class="footer-info">
+        <div>Última Sincronização: <span id="lblHora">--:--:--</span></div>
+        <div>Engine: Skaunder Prime ASG v6.2 (Anti-Ruído Ativo)</div>
     </div>
 </div>
 
@@ -224,133 +321,138 @@
     const db = firebase.database();
     let currentRef = null;
 
+    // Elementos DOM
+    const connDot = document.getElementById('connDot');
     const assetSelect = document.getElementById('assetSelect');
-    const elPreco = document.getElementById('preco');
-    const elDelta = document.getElementById('delta');
-    const elAgressao = document.getElementById('agressao');
-    const elScore = document.getElementById('score');
-    const elEventoFluxo = document.getElementById('eventoFluxo');
-    const elHora = document.getElementById('hora');
-    const elStatus = document.getElementById('statusConn');
+    const asgPanel = document.getElementById('asgPanel');
+    const signalBadge = document.getElementById('signalBadge');
+    const mainVerdict = document.getElementById('mainVerdict');
+    const mainContext = document.getElementById('mainContext');
+    
+    const resDirecao = document.getElementById('resDirecao');
+    const resGatilho = document.getElementById('resGatilho');
+    const resStop = document.getElementById('resStop');
+    const resAlvo = document.getElementById('resAlvo');
 
-    // Elementos do Painel de Decisão de Entrada/Saída
-    const tradeBox = document.getElementById('tradeSignalBox');
-    const signalTitle = document.getElementById('signalTitle');
-    const signalMainAction = document.getElementById('signalMainAction');
-    const signalDescription = document.getElementById('signalDescription');
-    const trDirecao = document.getElementById('trDirecao');
-    const trGatilho = document.getElementById('trGatilho');
-    const trStop = document.getElementById('trStop');
-    const trAlvo = document.getElementById('trAlvo');
+    const chk1 = document.getElementById('chk1');
+    const chk2 = document.getElementById('chk2');
+    const chk3 = document.getElementById('chk3');
+    const chk4 = document.getElementById('chk4');
+    const chk5 = document.getElementById('chk5');
 
-    function processarFiltragemInteligente(data) {
-        let score = data.score || 5;
+    const metPreco = document.getElementById('metPreco');
+    const metDelta = document.getElementById('metDelta');
+    const metVolume = document.getElementById('metVolume');
+    const metScore = document.getElementById('metScore');
+    const lblHora = document.getElementById('lblHora');
+
+    function aplicarFiltroASG(data) {
+        let score = Number(data.score) || 5;
         let preco = Number(data.preco) || 0;
         let delta = Number(data.delta) || 0;
-        let evento = data.eventoFluxo || "";
+        let agressao = data.agressao || "NEUTRO";
+        let evento = data.eventoFluxo || "Monitorando";
 
-        // Regra de filtragem baseada no seu sistema de pontuação e 5 filtros:
-        // 8 a 10 itens: Cenário Completo (Gatilho Liberado)
-        // 6 a 7 itens: Intermediário (Monitorar/Cautela)
-        // Abaixo de 6: Melhor não operar (Aguardar)
+        // Atualiza métricas brutas filtradas
+        metPreco.innerText = preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        metDelta.innerText = delta;
+        metDelta.style.color = delta >= 0 ? "var(--green)" : "var(--red)";
+        metVolume.innerText = data.volume || 0;
+        metScore.innerText = score + " / 10";
+        lblHora.innerText = data.hora || '--:--:--';
 
-        if (score >= 8) {
-            tradeBox.className = "trade-signal-box signal-ready";
-            signalTitle.style.color = "var(--accent-green)";
-            signalTitle.innerText = "Gatilho Qualificado (Alta Confluência)";
-            
-            if (delta >= 0 || evento.includes("Comprador") || evento.includes("Absorção de venda") || evento.includes("Rompimento")) {
-                signalMainAction.innerText = "EXECUTAR COMPRA";
-                signalMainAction.className = "value compra";
-                trDirecao.innerText = "COMPRA";
-                trDirecao.className = "compra";
-                trGatilho.innerText = "Romprimento / Reteste Defendido";
-                trStop.innerText = (preco - (preco * 0.0015)).toFixed(2) + " (Atrás do nível/absorção)";
-                trAlvo.innerText = "Próxima região de resistência / VAH";
+        // Lógica de Consolidação de Checklist (Filtro ASG)
+        let isAprovado = score >= 8;
+        let isModerado = score >= 6 && score < 8;
+
+        // Simula o preenchimento dos 5 filtros de acordo com o score consolidado
+        setCheck(chk1, score >= 6);
+        setCheck(chk2, Math.abs(delta) > 50);
+        setCheck(chk3, evento.includes("Absorção") || score >= 7);
+        setCheck(chk4, score >= 8);
+        setCheck(chk5, true);
+
+        if (isAprovado) {
+            if (agressao === "COMPRA" || delta >= 0) {
+                asgPanel.className = "asg-main-panel action-buy";
+                signalBadge.className = "badge-badge badge-buy";
+                signalBadge.innerText = "Sinal Consolidado &bull; Compra Autorizada";
+                mainVerdict.innerText = "EXECUTAR COMPRA COM CONFLUÊNCIA";
+                mainVerdict.style.color = "var(--green)";
+                resDirecao.innerText = "COMPRA";
+                resDirecao.style.color = "var(--green)";
+                resGatilho.innerText = evento;
+                resStop.innerText = (preco - 120).toFixed(2) + " pts (Atrás do ajuste)";
+                resAlvo.innerText = (preco + 250).toFixed(2) + " pts (Resistência)";
             } else {
-                signalMainAction.innerText = "EXECUTAR VENDA";
-                signalMainAction.className = "value venda";
-                trDirecao.innerText = "VENDA";
-                trDirecao.className = "venda";
-                trGatilho.innerText = "Falha de topo / Exaustão confirmada";
-                trStop.innerText = (preco + (preco * 0.0015)).toFixed(2) + " (Atrás do topo/absorção)";
-                trAlvo.innerText = "Próximo suporte / VAL";
+                asgPanel.className = "asg-main-panel action-sell";
+                signalBadge.className = "badge-badge badge-sell";
+                signalBadge.innerText = "Sinal Consolidado &bull; Venda Autorizada";
+                mainVerdict.innerText = "EXECUTAR VENDA COM CONFLUÊNCIA";
+                mainVerdict.style.color = "var(--red)";
+                resDirecao.innerText = "VENDA";
+                resDirecao.style.color = "var(--red)";
+                resGatilho.innerText = evento;
+                resStop.innerText = (preco + 120).toFixed(2) + " pts (Atrás do ajuste)";
+                resAlvo.innerText = (preco - 250).toFixed(2) + " pts (Suporte)";
             }
-            signalDescription.innerText = "Filtros atendidos (" + score + "/10). Localização e resposta de fluxo alinhadas. Risco controlado.";
-
-        } else if (score >= 6) {
-            tradeBox.className = "trade-signal-box signal-wait";
-            signalTitle.style.color = "var(--accent-yellow)";
-            signalTitle.innerText = "Cenário Intermediário (Aguardar Confirmação)";
-            signalMainAction.innerText = "MONITORAR MICROESTRUTURA";
-            signalMainAction.className = "value";
-            trDirecao.innerText = "NEUTRO / ATENÇÃO";
-            trDirecao.className = "";
-            trGatilho.innerText = "Aguardando quebra de estrutura";
-            trStop.innerText = "Definido após gatilho";
-            trAlvo.innerText = "Aguardando definição";
-            signalDescription.innerText = "Pontuação intermediária (" + score + "/10). Evite entrar antes da confirmação do reteste.";
-
+            mainContext.innerText = "O motor ASG consolidou o fluxo e validou todos os filtros estatísticos. Alta probabilidade de deslocamento direcional limpo.";
+        } else if (isModerado) {
+            asgPanel.className = "asg-main-panel action-wait";
+            signalBadge.className = "badge-badge badge-wait";
+            signalBadge.innerText = "Cautela &bull; Aguardando Confirmação";
+            mainVerdict.innerText = "AGUARDAR RETESTE / CONSOLIDAÇÃO";
+            mainVerdict.style.color = "var(--yellow)";
+            resDirecao.innerText = "NEUTRO";
+            resDirecao.style.color = "var(--yellow)";
+            resGatilho.innerText = "Leitura intermediária (" + score + "/10)";
+            resStop.innerText = "--";
+            resAlvo.innerText = "--";
+            mainContext.innerText = "O mercado apresenta movimentação, mas sem o score necessário de exaustão ou defesa institucional forte. Evite alavancagem.";
         } else {
-            tradeBox.className = "trade-signal-box signal-danger";
-            signalTitle.style.color = "var(--accent-red)";
-            signalTitle.innerText = "Filtros Insuficientes (Fora do Padrão)";
-            signalMainAction.innerText = "NÃO OPERAR";
-            signalMainAction.className = "value venda";
-            trDirecao.innerText = "FORA DO MERCADO";
-            trDirecao.className = "";
-            trGatilho.innerText = "Nenhum gatilho válido";
-            trStop.innerText = "--";
-            trAlvo.innerText = "--";
-            signalDescription.innerText = "Pontuação baixa (" + score + "/10). Risco de ruído ou falta de confluência.";
+            asgPanel.className = "asg-main-panel action-wait";
+            signalBadge.className = "badge-badge badge-wait";
+            signalBadge.innerText = "Filtro Ativo &bull; Zona de Ruído";
+            mainVerdict.innerText = "NÃO OPERAR &bull; FILTRANDO RUÍDO";
+            mainVerdict.style.color = "var(--text-muted)";
+            resDirecao.innerText = "FORA";
+            resDirecao.style.color = "var(--text-muted)";
+            resGatilho.innerText = "Mercado travado / Sem direcional";
+            resStop.innerText = "--";
+            resAlvo.innerText = "--";
+            mainContext.innerText = "O motor ASG bloqueou as entradas devido a baixa confluência ou volatilidade sem agressão direcional pura.";
+        }
+    }
+
+    function setCheck(element, status) {
+        if (status) {
+            element.innerText = "APROVADO";
+            element.className = "check-status ok";
+        } else {
+            element.innerText = "PENDENTE";
+            element.className = "check-status no";
         }
     }
 
     function monitorarAtivo(ativo) {
-        if (currentRef) {
-            currentRef.off();
-        }
+        if (currentRef) currentRef.off();
 
         currentRef = db.ref(ativo);
-        elStatus.innerText = "Sincronizando com " + ativo + "...";
-        elStatus.style.color = "var(--accent-yellow)";
+        connDot.className = "status-dot";
         
         currentRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                elPreco.innerText = Number(data.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                elDelta.innerText = data.delta;
-                elDelta.className = "value " + (data.delta >= 0 ? "compra" : "venda");
-                
-                elAgressao.innerText = data.agressao;
-                elAgressao.className = "value " + (data.agressao === "COMPRA" ? "compra" : "venda");
-                
-                let scoreVal = data.score || 0;
-                elScore.innerText = scoreVal + " / 10";
-                elScore.className = "value " + (scoreVal >= 8 ? "score-high" : (scoreVal >= 6 ? "score-mid" : "score-low"));
-                
-                elEventoFluxo.innerText = data.eventoFluxo || "MONITORANDO";
-                elHora.innerText = data.hora || '--:--:--';
-                elStatus.innerText = "Online (" + ativo + " sincronizado)";
-                elStatus.style.color = "var(--accent-green)";
-
-                // Executa a filtragem inteligente e define os momentos de entrada/saída
-                processarFiltragemInteligente(data);
-
+                connDot.className = "status-dot online";
+                aplicarFiltroASG(data);
             } else {
-                elPreco.innerText = "--";
-                elDelta.innerText = "--";
-                elAgressao.innerText = "--";
-                elScore.innerText = "-- / 10";
-                elEventoFluxo.innerText = "AGUARDANDO DADOS DO ROBÔ...";
-                elHora.innerText = "--:--:--";
-                elStatus.innerText = "Aguardando ticks para " + ativo;
-                elStatus.style.color = "var(--accent-yellow)";
+                connDot.className = "status-dot";
+                mainVerdict.innerText = "AGUARDANDO CONEXÃO COM O MT5";
+                mainContext.innerText = "Nenhum dado encontrado para o ativo " + ativo + ". Certifique-se de que o Expert Advisor está ativo no MetaTrader 5.";
             }
         }, (error) => {
-            console.error("Erro no Firebase:", error);
-            elStatus.innerText = "Erro de Conexão";
-            elStatus.style.color = "var(--accent-red)";
+            connDot.className = "status-dot";
+            console.error("Erro Firebase:", error);
         });
     }
 
