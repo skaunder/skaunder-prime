@@ -251,7 +251,7 @@
     <div class="header">
         <div class="brand">
             <h1>SKAUNDER PRIME <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">| Sistema ASG & Fluxo Real-Time</span></h1>
-            <div id="brandSub" class="brand-sub">🟢 SELETOR WDO / WIN ATIVO (CANDLES 1M NELOGICA PROFIT)</div>
+            <div id="brandSub" class="brand-sub">🟢 LETRAS VIGENTES CALCULADAS AUTOMATICAMENTE (B3)</div>
         </div>
 
         <div class="header-controls">
@@ -261,14 +261,13 @@
 
         <div>
             <select id="assetSelect" class="asset-select" onchange="trocarAtivoInstantaneo()">
-                <option value="WDO">WDO (Mini Dólar)</option>
-                <option value="WIN">WIN (Mini Índice)</option>
+                <option value="WDO" id="optWDO">WDO (Mini Dólar)</option>
+                <option value="WIN" id="optWIN">WIN (Mini Índice)</option>
             </select>
         </div>
     </div>
 
     <div class="dashboard-grid">
-        <!-- COLUNA ESQUERDA: CONTEXTO & TAPE READING -->
         <div>
             <div class="card">
                 <div class="card-title">1. Contexto & Fluxo (Tape Reading)</div>
@@ -314,7 +313,6 @@
             </div>
         </div>
 
-        <!-- COLUNA CENTRAL: PLACAR ASG, SETA DIRECIONAL E GRÁFICO 1M PROFIT -->
         <div>
             <div class="card">
                 <div class="card-title">Placar Estatístico Integrado (ASG)</div>
@@ -334,11 +332,11 @@
             <div class="chart-card">
                 <div class="chart-header">
                     <div class="chart-title">
-                        <span id="chartSymbol">WDOU26</span>
+                        <span id="chartSymbol">WDO...</span>
                         <span id="chartBadge" class="chart-badge">1m (Candle Nelogica Profit Style)</span>
                     </div>
                     <div style="font-size: 11px; color: var(--text-muted);">
-                        ULT: <b id="chartLastPrice" style="color: #fff;">5611.12</b>
+                        ULT: <b id="chartLastPrice" style="color: #fff;">0.00</b>
                     </div>
                 </div>
                 
@@ -353,7 +351,6 @@
             </div>
         </div>
 
-        <!-- COLUNA DIREITA: STOP CURTO & ALVO LONGO + TIMES & TRADES -->
         <div>
             <div class="card">
                 <div class="card-title">Stop Curto & Alvo Longo</div>
@@ -377,20 +374,51 @@
             </div>
 
             <div class="card" style="margin-bottom: 0;">
-                <div class="card-title" id="ttTitle">TIMES & TRADES - WDOU26</div>
+                <div class="card-title" id="ttTitle">TIMES & TRADES - WDO</div>
                 <div id="ttStream" class="tt-stream"></div>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPTS DE CONFIGURAÇÃO DE DADOS E TEMPO REAL -->
     <script>
+        // Função para calcular automaticamente a letra vigente do contrato de acordo com a B3
+        function obterCodigoVigente(tipo) {
+            const agora = new Date();
+            const ano = agora.getFullYear().toString().slice(-2);
+            const mes = agora.getMonth(); // 0 a 11
+
+            if (tipo === 'WDO') {
+                // WDO: Vencimento mensal (F, G, H, J, K, M, N, Q, U, V, X, Z)
+                const letrasWDO = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z'];
+                return 'WDO' + letrasWDO[mes] + ano;
+            } else if (tipo === 'WIN') {
+                // WIN: Vencimento bimestral em meses pares (G=Fev, J=Abr, M=Jun, Q=Ago, V=Out, Z=Dez)
+                const mesesWIN = [
+                    { maxMes: 1, letra: 'G' },
+                    { maxMes: 3, letra: 'J' },
+                    { maxMes: 5, letra: 'M' },
+                    { maxMes: 7, letra: 'Q' },
+                    { maxMes: 9, letra: 'V' },
+                    { maxMes: 11, letra: 'Z' }
+                ];
+                let letraAtiva = 'Q';
+                for (let item of mesesWIN) {
+                    if (mes <= item.maxMes) {
+                        letraAtiva = item.letra;
+                        break;
+                    }
+                }
+                return 'WIN' + letraAtiva + ano;
+            }
+            return tipo;
+        }
+
         let tipoAtivoAtual = "WDO";
 
-        // ESTADOS SEPARADOS PARA WDO E WIN COM CONTROLE ESTREITO DE TEMPO (1 MINUTO)
+        // ESTADOS INDEPENDENTES E ISOLADOS PARA CADA ATIVO
         const estadosAtivos = {
             "WDO": {
-                codigo: "WDOU26",
+                codigo: obterCodigoVigente("WDO"),
                 precoBase: 5611.12,
                 contadorMilisegundosCandle: 0,
                 historicoCandles: [
@@ -403,7 +431,6 @@
                 delta: 103,
                 buyRatio: 54,
                 sellRatio: 46,
-                scoreTotal: 5,
                 scores: [1, 1, 1, 1, 1],
                 estrangeiros: 41.5,
                 institucional: 3.2,
@@ -416,7 +443,7 @@
                 ]
             },
             "WIN": {
-                codigo: "WINZ26",
+                codigo: obterCodigoVigente("WIN"),
                 precoBase: 128500.00,
                 contadorMilisegundosCandle: 0,
                 historicoCandles: [
@@ -429,7 +456,6 @@
                 delta: -42,
                 buyRatio: 48,
                 sellRatio: 52,
-                scoreTotal: 3,
                 scores: [1, 0, 1, 0, 1],
                 estrangeiros: 142.5,
                 institucional: -68.2,
@@ -661,7 +687,7 @@
             }
         }
 
-        // TICKER DE TEMPO REAL COM FECHAMENTO DE CANDLE ESTRITO DE 1 MINUTO (60.000 ms)
+        // TICKER DE TEMPO REAL COM FECHAMENTO DE CANDLE DE 1 MINUTO (60.000 ms)
         function iniciarTickerDinamico() {
             const intervaloSimulacao = 200;
 
@@ -673,7 +699,6 @@
                     const st = estadosAtivos[ativoKey];
                     st.contadorMilisegundosCandle += intervaloSimulacao;
                     
-                    // Rotina de fechamento do candle de 1 minuto em tempo real
                     if (st.contadorMilisegundosCandle >= 60000) {
                         st.contadorMilisegundosCandle = 0;
                         if (st.historicoCandles.length > 30) st.historicoCandles.shift();
@@ -712,12 +737,15 @@
         }
 
         window.onload = () => {
+            // Atualiza os labels dos selects com as letras vigentes calculadas
+            document.getElementById('optWDO').innerText = `WDO (${estadosAtivos['WDO'].codigo}) - Mini Dólar`;
+            document.getElementById('optWIN').innerText = `WIN (${estadosAtivos['WIN'].codigo}) - Mini Índice`;
+
             renderizarAtivoAtual();
             iniciarTickerDinamico();
         };
     </script>
 
-    <!-- FIREBASE REAL-TIME COM MÍNIMA LATÊNCIA -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
