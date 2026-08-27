@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime | Profit Pro Layout (1m Candles)</title>
+    <title>Skaunder Prime | Profit Pro Layout (1m Independent Assets)</title>
     <style>
         :root {
             --bg-dark: #12161f;
@@ -328,7 +328,6 @@
                 
                 <div class="chart-toolbar">
                     <button class="tb-btn">🕯️ Candles</button>
-                    <button class="tb-btn">10s</button>
                     <button class="tb-btn active">1m</button>
                     <button class="tb-btn">VWAP / Regressão</button>
                     <button class="tb-btn" style="margin-left:auto;">🔍 Zoom Pro</button>
@@ -340,8 +339,7 @@
             <div class="card" style="margin-bottom: 0;">
                 <div class="card-title" id="ttTitle">TIMES & TRADES - AGRESSÕES WDOU26</div>
                 <div id="ttStream" class="tt-stream">
-                    <div class="tt-row"><span><b>Goldman Sachs</b></span><span class="tt-buy">12 cont @ 5611.12 (COMPRA)</span></div>
-                    <div class="tt-row"><span><b>UBS</b></span><span class="tt-sell">56 cont @ 5610.62 (VENDA)</span></div>
+                    <!-- Stream populado dinamicamente por ativo -->
                 </div>
             </div>
         </div>
@@ -349,10 +347,68 @@
 
     <script>
         let tipoAtivoAtual = "WDO";
-        let codigoContratoAtual = "WDOU26";
-        let precoBase = 5611.12;
-        let historicoCandles = [];
-        let contadorMilisegundosCandle = 0;
+
+        // ESTADOS SEPARADOS E INDEPENDENTES PARA WDO E WIN
+        const estadosAtivos = {
+            "WDO": {
+                codigo: "WDOU26",
+                precoBase: 5611.12,
+                contadorMilisegundosCandle: 0,
+                historicoCandles: [
+                    { open: 5612.00, high: 5614.50, low: 5611.00, close: 5613.00, vol: 1420 },
+                    { open: 5613.00, high: 5613.50, low: 5610.00, close: 5611.00, vol: 980 },
+                    { open: 5611.00, high: 5615.00, low: 5611.00, close: 5614.00, vol: 2300 },
+                    { open: 5614.00, high: 5617.00, low: 5614.00, close: 5616.00, vol: 3100 },
+                    { open: 5616.00, high: 5618.00, low: 5615.00, close: 5617.00, vol: 1850 },
+                    { open: 5617.00, high: 5617.50, low: 5613.00, close: 5614.00, vol: 1200 },
+                    { open: 5614.00, high: 5615.00, low: 5611.00, close: 5612.00, vol: 1650 },
+                    { open: 5612.00, high: 5613.00, low: 5609.00, close: 5610.00, vol: 2100 },
+                    { open: 5610.00, high: 5612.00, low: 5609.50, close: 5611.12, vol: 1950 }
+                ],
+                delta: 103,
+                buyRatio: 54,
+                sellRatio: 46,
+                score: 3.4,
+                scoreStatus: "⚖️ MERCADO EM CONSOLIDAÇÃO",
+                estrangeiros: 41.5,
+                institucional: 3.2,
+                varejo: -44.7,
+                veredicto: "🟢 PRESSÃO COMPRADORA / ROMPIMENTO IMINENTE",
+                trades: [
+                    { player: 'Goldman Sachs', volume: 12, preco: 5611.12, agressao: 'COMPRA' },
+                    { player: 'UBS', volume: 56, preco: 5610.62, agressao: 'VENDA' }
+                ]
+            },
+            "WIN": {
+                codigo: "WINZ26",
+                precoBase: 128500.00,
+                contadorMilisegundosCandle: 0,
+                historicoCandles: [
+                    { open: 128400, high: 128600, low: 128350, close: 128500, vol: 15200 },
+                    { open: 128500, high: 128650, low: 128420, close: 128600, vol: 18400 },
+                    { open: 128600, high: 128800, low: 128550, close: 128720, vol: 24100 },
+                    { open: 128720, high: 128900, low: 128680, close: 128840, vol: 31000 },
+                    { open: 128840, high: 128950, low: 128750, close: 128800, vol: 19500 },
+                    { open: 128800, high: 128850, low: 128600, close: 128650, vol: 14200 },
+                    { open: 128650, high: 128750, low: 128500, close: 128500, vol: 17600 },
+                    { open: 128500, high: 128600, low: 128380, close: 128450, vol: 21000 },
+                    { open: 128450, high: 128580, low: 128400, close: 128500, vol: 16500 }
+                ],
+                delta: -42,
+                buyRatio: 48,
+                sellRatio: 52,
+                score: 2.8,
+                scoreStatus: "⚖️ MERCADO EM CONSOLIDAÇÃO",
+                estrangeiros: 142.5,
+                institucional: -68.2,
+                varejo: -74.3,
+                veredicto: "🟡 ACUMULAÇÃO DE LOTE / AGUARDAR GATILHO",
+                trades: [
+                    { player: 'XP Investimentos', volume: 150, preco: 128500, agressao: 'VENDA' },
+                    { player: 'BTG Pactual', volume: 80, preco: 128520, agressao: 'COMPRA' }
+                ]
+            }
+        };
 
         function getQuartaMaisProximaDoDia15(ano, mesIndex) {
             const d15 = new Date(ano, mesIndex, 15);
@@ -402,80 +458,83 @@
             const contratoWDO = obterContratoVigente('WDO');
             const contratoWIN = obterContratoVigente('WIN');
 
+            estadosAtivos['WDO'].codigo = contratoWDO;
+            estadosAtivos['WIN'].codigo = contratoWIN;
+
             const optWDO = document.getElementById('optWDO');
-            optWDO.value = contratoWDO;
+            optWDO.value = 'WDO';
             optWDO.innerText = `WDO (${contratoWDO} - Mini Dólar)`;
 
             const optWIN = document.getElementById('optWIN');
-            optWIN.value = contratoWIN;
+            optWIN.value = 'WIN';
             optWIN.innerText = `WIN (${contratoWIN} - Mini Índice)`;
         }
 
         function trocarAtivoInstantaneo() {
             const selectEl = document.getElementById('assetSelect');
-            codigoContratoAtual = selectEl.value;
-            tipoAtivoAtual = codigoContratoAtual.startsWith('WIN') ? 'WIN' : 'WDO';
-            contadorMilisegundosCandle = 0;
-            
-            document.getElementById('chartSymbol').innerText = codigoContratoAtual;
-            document.getElementById('ttTitle').innerText = `TIMES & TRADES - AGRESSÕES ${codigoContratoAtual}`;
-            
-            if (tipoAtivoAtual === 'WIN') {
-                precoBase = 128500.00;
-                historicoCandles = [
-                    { open: 128400, high: 128600, low: 128350, close: 128500, vol: 15200 },
-                    { open: 128500, high: 128650, low: 128420, close: 128600, vol: 18400 },
-                    { open: 128600, high: 128800, low: 128550, close: 128720, vol: 24100 },
-                    { open: 128720, high: 128900, low: 128680, close: 128840, vol: 31000 },
-                    { open: 128840, high: 128950, low: 128750, close: 128800, vol: 19500 },
-                    { open: 128800, high: 128850, low: 128600, close: 128650, vol: 14200 },
-                    { open: 128650, high: 128750, low: 128500, close: 128500, vol: 17600 },
-                    { open: 128500, high: 128600, low: 128380, close: 128450, vol: 21000 },
-                    { open: 128450, high: 128580, low: 128400, close: 128500, vol: 16500 }
-                ];
-                document.getElementById('valEstrangeiros').className = 'player-val-buy';
-                document.getElementById('valEstrangeiros').innerHTML = '+R$ 142.5M <small>(COMPRA)</small>';
-                document.getElementById('valInstitucional').className = 'player-val-sell';
-                document.getElementById('valInstitucional').innerHTML = '-R$ 68.2M <small>(VENDA)</small>';
-                document.getElementById('valVarejo').className = 'player-val-sell';
-                document.getElementById('valVarejo').innerHTML = '-R$ 74.3M <small>(VENDA)</small>';
-            } else {
-                precoBase = 5611.12;
-                historicoCandles = [
-                    { open: 5612.00, high: 5614.50, low: 5611.00, close: 5613.00, vol: 1420 },
-                    { open: 5613.00, high: 5613.50, low: 5610.00, close: 5611.00, vol: 980 },
-                    { open: 5611.00, high: 5615.00, low: 5611.00, close: 5614.00, vol: 2300 },
-                    { open: 5614.00, high: 5617.00, low: 5614.00, close: 5616.00, vol: 3100 },
-                    { open: 5616.00, high: 5618.00, low: 5615.00, close: 5617.00, vol: 1850 },
-                    { open: 5617.00, high: 5617.50, low: 5613.00, close: 5614.00, vol: 1200 },
-                    { open: 5614.00, high: 5615.00, low: 5611.00, close: 5612.00, vol: 1650 },
-                    { open: 5612.00, high: 5613.00, low: 5609.00, close: 5610.00, vol: 2100 },
-                    { open: 5610.00, high: 5612.00, low: 5609.50, close: 5611.12, vol: 1950 }
-                ];
-                document.getElementById('valEstrangeiros').className = 'player-val-buy';
-                document.getElementById('valEstrangeiros').innerHTML = '+R$ 41.5M <small>(COMPRA)</small>';
-                document.getElementById('valInstitucional').className = 'player-val-buy';
-                document.getElementById('valInstitucional').innerHTML = '+R$ 3.2M <small>(DEFESA)</small>';
-                document.getElementById('valVarejo').className = 'player-val-sell';
-                document.getElementById('valVarejo').innerHTML = '-R$ 44.7M <small>(VENDA)</small>';
-            }
+            tipoAtivoAtual = selectEl.value; // 'WDO' ou 'WIN'
+            renderizarAtivoAtual();
+        }
 
+        function renderizarAtivoAtual() {
+            const st = estadosAtivos[tipoAtivoAtual];
+            
+            document.getElementById('chartSymbol').innerText = st.codigo;
+            document.getElementById('ttTitle').innerText = `TIMES & TRADES - AGRESSÕES ${st.codigo}`;
+            document.getElementById('chartLastPrice').innerText = st.precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0);
+
+            // Placar & Indicadores
+            document.getElementById('scoreVal').innerText = Number(st.score).toFixed(1);
+            document.getElementById('scoreVal').style.color = st.score >= 3.2 ? 'var(--green)' : '#ffb74d';
+            document.getElementById('scoreStatus').innerText = st.scoreStatus;
+
+            const deltaEl = document.getElementById('deltaVal');
+            deltaEl.innerText = `Delta: ${st.delta > 0 ? '+' : ''}${st.delta}`;
+            deltaEl.style.color = st.delta >= 0 ? 'var(--green)' : 'var(--red)';
+
+            document.getElementById('buyRatioLabel').innerText = `BUY ${st.buyRatio}% / SELL ${st.sellRatio}%`;
+            document.getElementById('deltaBar').style.width = `${st.buyRatio}%`;
+
+            // Players
+            const est = Number(st.estrangeiros);
+            const elEst = document.getElementById('valEstrangeiros');
+            elEst.className = est >= 0 ? 'player-val-buy' : 'player-val-sell';
+            elEst.innerHTML = `${est >= 0 ? '+' : ''}R$ ${est.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${est >= 0 ? 'COMPRA' : 'VENDA'})</small>`;
+
+            const inst = Number(st.institucional);
+            const elInst = document.getElementById('valInstitucional');
+            elInst.className = inst >= 0 ? 'player-val-buy' : 'player-val-sell';
+            elInst.innerHTML = `${inst >= 0 ? '+' : ''}R$ ${inst.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${inst >= 0 ? 'DEFESA' : 'SAÍDA'})</small>`;
+
+            const varVal = Number(st.varejo);
+            const elVar = document.getElementById('valVarejo');
+            elVar.className = varVal >= 0 ? 'player-val-buy' : 'player-val-sell';
+            elVar.innerHTML = `${varVal >= 0 ? '+' : ''}R$ ${varVal.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${varVal >= 0 ? 'COMPRA' : 'VENDA'})</small>`;
+
+            document.getElementById('veredictoBox').innerText = st.veredicto;
+
+            // Times & Trades stream
             const stream = document.getElementById('ttStream');
             stream.innerHTML = '';
-            for(let i=0; i<4; i++) {
-                let pSample = precoBase + (Math.random() * 4 - 2) * (tipoAtivoAtual === 'WDO' ? 0.5 : 40);
-                let vSample = Math.floor(10 + Math.random() * 90);
-                let agSample = Math.random() > 0.45 ? 'COMPRA' : 'VENDA';
-                let brokerSample = ['XP Investimentos', 'Goldman Sachs', 'UBS', 'BTG Pactual'][i];
-                adicionarTimesTrades(brokerSample, vSample, pSample, agSample);
-            }
+            st.trades.forEach(t => {
+                const novaLinha = document.createElement('div');
+                novaLinha.className = 'tt-row';
+                const isBuy = t.agressao === 'COMPRA';
+                novaLinha.innerHTML = `
+                    <span><b>${t.player}</b></span>
+                    <span class="${isBuy ? 'tt-buy' : 'tt-sell'}">
+                        ${t.volume} cont @ ${Number(t.preco).toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0)} (${t.agressao})
+                    </span>
+                `;
+                stream.appendChild(novaLinha);
+            });
 
-            document.getElementById('chartLastPrice').innerText = precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0);
             desenharGraficoProfitPro();
         }
 
         function executarOrdemSimulada(tipo) {
-            alert(`Ordem de ${tipo} executada em ${codigoContratoAtual} a ${precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0)}`);
+            const st = estadosAtivos[tipoAtivoAtual];
+            alert(`Ordem de ${tipo} executada em ${st.codigo} a ${st.precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0)}`);
         }
 
         function desenharGraficoProfitPro() {
@@ -500,6 +559,8 @@
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartWidth, y); ctx.stroke();
             }
 
+            const st = estadosAtivos[tipoAtivoAtual];
+            const historicoCandles = st.historicoCandles;
             const count = historicoCandles.length;
             if (count === 0) return;
             const candleWidth = chartWidth / count;
@@ -542,7 +603,7 @@
                 ctx.fillRect(x, volY, bodyWidth, volHeight);
             });
 
-            const lastY = chartHeight * 0.75 - ((precoBase - minP) / range) * (chartHeight * 0.75);
+            const lastY = chartHeight * 0.75 - ((st.precoBase - minP) / range) * (chartHeight * 0.75);
             ctx.strokeStyle = '#2962ff';
             ctx.lineWidth = 1;
             ctx.setLineDash([4, 4]);
@@ -570,146 +631,113 @@
             ctx.fillRect(chartWidth, lastY - 9, rightPadding, 18);
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 11px sans-serif';
-            ctx.fillText(precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0), chartWidth + 6, lastY + 4);
+            ctx.fillText(st.precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0), chartWidth + 6, lastY + 4);
         }
 
-        function atualizarInterfaceComDados(data) {
-            if (data.preco !== undefined) {
-                precoBase = Number(data.preco);
-                document.getElementById('chartLastPrice').innerText = precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0);
+        function processarTickParaAtivo(ativoKey, data) {
+            const st = estadosAtivos[ativoKey];
+            if (!st) return;
 
-                if (historicoCandles.length > 0) {
-                    let ultimo = historicoCandles[historicoCandles.length - 1];
-                    ultimo.close = precoBase;
-                    if (precoBase > ultimo.high) ultimo.high = precoBase;
-                    if (precoBase < ultimo.low) ultimo.low = precoBase;
+            if (data.preco !== undefined) {
+                st.precoBase = Number(data.preco);
+                if (st.historicoCandles.length > 0) {
+                    let ultimo = st.historicoCandles[st.historicoCandles.length - 1];
+                    ultimo.close = st.precoBase;
+                    if (st.precoBase > ultimo.high) ultimo.high = st.precoBase;
+                    if (st.precoBase < ultimo.low) ultimo.low = st.precoBase;
                     ultimo.vol += Math.floor(5 + Math.random() * 25);
-                    desenharGraficoProfitPro();
                 }
             }
 
-            const agora = new Date();
-            document.getElementById('clockDisplay').innerText = data.hora || agora.toTimeString().split(' ')[0];
-
-            if (data.delta !== undefined) {
-                const deltaVal = Number(data.delta);
-                const deltaEl = document.getElementById('deltaVal');
-                deltaEl.innerText = `Delta: ${deltaVal > 0 ? '+' : ''}${deltaVal}`;
-                deltaEl.style.color = deltaVal >= 0 ? 'var(--green)' : 'var(--red)';
-            }
-
-            if (data.buyRatio !== undefined && data.sellRatio !== undefined) {
-                const bRatio = Number(data.buyRatio);
-                const sRatio = Number(data.sellRatio);
-                document.getElementById('buyRatioLabel').innerText = `BUY ${bRatio}% / SELL ${sRatio}%`;
-                document.getElementById('deltaBar').style.width = `${bRatio}%`;
-            }
-
+            if (data.delta !== undefined) st.delta = Number(data.delta);
+            if (data.buyRatio !== undefined) st.buyRatio = Number(data.buyRatio);
+            if (data.sellRatio !== undefined) st.sellRatio = Number(data.sellRatio);
             if (data.score !== undefined) {
-                const sc = Number(data.score).toFixed(1);
-                document.getElementById('scoreVal').innerText = sc;
-                document.getElementById('scoreVal').style.color = sc >= 3.2 ? 'var(--green)' : '#ffb74d';
+                st.score = Number(data.score);
+                st.scoreStatus = st.score >= 3.2 ? '🚀 TENDÊNCIA DE ALTA DEFINIDA' : '⚖️ MERCADO EM CONSOLIDAÇÃO';
             }
-            if (data.scoreStatus) {
-                document.getElementById('scoreStatus').innerText = data.scoreStatus;
-            }
-
-            if (data.estrangeiros !== undefined) {
-                const est = Number(data.estrangeiros);
-                const el = document.getElementById('valEstrangeiros');
-                el.className = est >= 0 ? 'player-val-buy' : 'player-val-sell';
-                el.innerHTML = `${est >= 0 ? '+' : ''}R$ ${est.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${est >= 0 ? 'COMPRA' : 'VENDA'})</small>`;
-            }
-            if (data.institucional !== undefined) {
-                const inst = Number(data.institucional);
-                const el = document.getElementById('valInstitucional');
-                el.className = inst >= 0 ? 'player-val-buy' : 'player-val-sell';
-                el.innerHTML = `${inst >= 0 ? '+' : ''}R$ ${inst.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${inst >= 0 ? 'DEFESA' : 'SAÍDA'})</small>`;
-            }
-            if (data.varejo !== undefined) {
-                const varVal = Number(data.varejo);
-                const el = document.getElementById('valVarejo');
-                el.className = varVal >= 0 ? 'player-val-buy' : 'player-val-sell';
-                el.innerHTML = `${varVal >= 0 ? '+' : ''}R$ ${varVal.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${varVal >= 0 ? 'COMPRA' : 'VENDA'})</small>`;
-            }
-            if (data.veredicto) {
-                document.getElementById('veredictoBox').innerText = data.veredicto;
-            }
+            if (data.estrangeiros !== undefined) st.estrangeiros = Number(data.estrangeiros);
+            if (data.institucional !== undefined) st.institucional = Number(data.institucional);
+            if (data.varejo !== undefined) st.varejo = Number(data.varejo);
+            if (data.veredicto) st.veredicto = data.veredicto;
 
             if (data.agressao && data.volume) {
-                adicionarTimesTrades(data.player || 'Corretora B3', data.volume, data.preco, data.agressao);
+                st.trades.unshift({
+                    player: data.player || 'Corretora B3',
+                    volume: data.volume,
+                    preco: data.preco || st.precoBase,
+                    agressao: data.agressao
+                });
+                if (st.trades.length > 25) st.trades.pop();
+            }
+
+            // Se o ativo que recebeu o dado for o que está atualmente na tela, atualiza a interface imediatamente
+            if (ativoKey === tipoAtivoAtual) {
+                renderizarAtivoAtual();
+                if (data.hora) {
+                    document.getElementById('clockDisplay').innerText = data.hora;
+                }
             }
         }
 
-        function adicionarTimesTrades(player, volume, preco, agressao) {
-            const stream = document.getElementById('ttStream');
-            const isBuy = agressao === 'COMPRA';
-            const novaLinha = document.createElement('div');
-            novaLinha.className = 'tt-row';
-            novaLinha.innerHTML = `
-                <span><b>${player}</b></span>
-                <span class="${isBuy ? 'tt-buy' : 'tt-sell'}">
-                    ${volume} cont @ ${Number(preco).toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0)} (${agressao})
-                </span>
-            `;
-            stream.insertBefore(novaLinha, stream.firstChild);
-            if (stream.children.length > 25) {
-                stream.removeChild(stream.lastChild);
-            }
-        }
-
-        // TICKER OTIMIZADO DE ALTA VELOCIDADE COM CANDLES DE 1 MINUTO (60000ms)
+        // SIMULADOR INDEPENDENTE PARA WDO E WIN (RODANDO EM PARALELO)
         function iniciarTickerDinamico() {
-            let intervaloSimulacao = 200; // Atualizações a cada 200ms
+            let intervaloSimulacao = 200; // 5 atualizações por segundo
             
             setInterval(() => {
-                contadorMilisegundosCandle += intervaloSimulacao;
-                
-                // Fechamento exato do candle de 1 minuto (60000ms)
-                if (contadorMilisegundosCandle >= 60000) {
-                    contadorMilisegundosCandle = 0;
-                    if (historicoCandles.length > 30) historicoCandles.shift();
-                    let ultimoFechamento = historicoCandles[historicoCandles.length - 1].close;
-                    historicoCandles.push({
-                        open: ultimoFechamento,
-                        high: ultimoFechamento,
-                        low: ultimoFechamento,
-                        close: ultimoFechamento,
-                        vol: Math.floor(100 + Math.random() * 400)
-                    });
-                }
+                const agora = new Date();
+                document.getElementById('clockDisplay').innerText = agora.toTimeString().split(' ')[0];
 
-                const step = tipoAtivoAtual === 'WDO' ? 0.25 : 25;
-                const variacao = (Math.random() - 0.48) * step * 1.5;
-                precoBase += variacao;
+                ['WDO', 'WIN'].forEach(ativoKey => {
+                    const st = estadosAtivos[ativoKey];
+                    st.contadorMilisegundosCandle += intervaloSimulacao;
+                    
+                    // Fechamento exato do candle de 1 minuto (60000ms)
+                    if (st.contadorMilisegundosCandle >= 60000) {
+                        st.contadorMilisegundosCandle = 0;
+                        if (st.historicoCandles.length > 30) st.historicoCandles.shift();
+                        let ultimoFechamento = st.historicoCandles[st.historicoCandles.length - 1].close;
+                        st.historicoCandles.push({
+                            open: ultimoFechamento,
+                            high: ultimoFechamento,
+                            low: ultimoFechamento,
+                            close: ultimoFechamento,
+                            vol: Math.floor(100 + Math.random() * 400)
+                        });
+                    }
 
-                const deltaSim = Math.floor((Math.random() * 320) - 150);
-                const buyR = Math.floor(42 + Math.random() * 22);
-                const sellR = 100 - buyR;
-                const scoreSim = (2.4 + Math.random() * 2.4).toFixed(1);
+                    const step = ativoKey === 'WDO' ? 0.25 : 25;
+                    const variacao = (Math.random() - 0.48) * step * 1.5;
+                    st.precoBase += variacao;
 
-                const playersList = ['Goldman Sachs', 'UBS', 'XP Investimentos', 'Morgan Stanley', 'BTG Pactual', 'Clear Corretora', 'Genial'];
-                const playerRand = playersList[Math.floor(Math.random() * playersList.length)];
-                const agrRand = Math.random() > 0.46 ? 'COMPRA' : 'VENDA';
-                const volRand = Math.floor(5 + Math.random() * 50);
+                    const deltaSim = Math.floor((Math.random() * 320) - 150);
+                    const buyR = Math.floor(42 + Math.random() * 22);
+                    const sellR = 100 - buyR;
+                    const scoreSim = (2.4 + Math.random() * 2.4).toFixed(1);
 
-                const dadosTick = {
-                    preco: precoBase,
-                    delta: deltaSim,
-                    buyRatio: buyR,
-                    sellRatio: sellR,
-                    score: scoreSim,
-                    scoreStatus: scoreSim >= 3.2 ? '🚀 TENDÊNCIA DE ALTA DEFINIDA' : '⚖️ MERCADO EM CONSOLIDAÇÃO',
-                    estrangeiros: (Math.random() * 70 - 25).toFixed(1),
-                    institucional: (Math.random() * 20 - 8).toFixed(1),
-                    varejo: (Math.random() * -60 + 15).toFixed(1),
-                    veredicto: scoreSim >= 3.2 ? '🟢 FLUXO INSTITUCIONAL COMPRADOR' : '🟡 ACUMULAÇÃO DE LOTE / AGUARDAR GATILHO',
-                    player: playerRand,
-                    agressao: agrRand,
-                    volume: volRand
-                };
+                    const playersList = ['Goldman Sachs', 'UBS', 'XP Investimentos', 'Morgan Stanley', 'BTG Pactual', 'Clear Corretora', 'Genial'];
+                    const playerRand = playersList[Math.floor(Math.random() * playersList.length)];
+                    const agrRand = Math.random() > 0.46 ? 'COMPRA' : 'VENDA';
+                    const volRand = Math.floor(5 + Math.random() * 50);
 
-                atualizarInterfaceComDados(dadosTick);
+                    const dadosTick = {
+                        preco: st.precoBase,
+                        delta: deltaSim,
+                        buyRatio: buyR,
+                        sellRatio: sellR,
+                        score: scoreSim,
+                        estrangeiros: (Math.random() * 70 - 25).toFixed(1),
+                        institucional: (Math.random() * 20 - 8).toFixed(1),
+                        varejo: (Math.random() * -60 + 15).toFixed(1),
+                        veredicto: Number(scoreSim) >= 3.2 ? '🟢 FLUXO INSTITUCIONAL COMPRADOR' : '🟡 ACUMULAÇÃO DE LOTE / AGUARDAR GATILHO',
+                        player: playerRand,
+                        agressao: agrRand,
+                        volume: volRand
+                    };
+
+                    processarTickParaAtivo(ativoKey, dadosTick);
+                });
+
             }, intervaloSimulacao);
         }
 
@@ -731,13 +759,24 @@
         try {
             firebase.initializeApp(firebaseConfig);
             const database = firebase.database();
+            
+            // Suporta dados no Firebase separados por nó (ex: /cotacao/WDO e /cotacao/WIN) ou payload contendo propriedade 'ativo'
             const cotacaoRef = database.ref('cotacao');
 
             cotacaoRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     document.getElementById('statusConnection').innerText = "🟢 AO VIVO (MT5 CONECTADO)";
-                    atualizarInterfaceComDados(data);
+                    
+                    // Se o Firebase enviar estrutura separada por ativo ({WDO: {...}, WIN: {...}})
+                    if (data.WDO || data.WIN) {
+                        if (data.WDO) processarTickParaAtivo('WDO', data.WDO);
+                        if (data.WIN) processarTickParaAtivo('WIN', data.WIN);
+                    } else {
+                        // Se enviar um único objeto informando qual é o ativo (ex: data.ativo = "WDO" ou "WIN")
+                        const targetAtivo = data.ativo || tipoAtivoAtual;
+                        processarTickParaAtivo(targetAtivo, data);
+                    }
                 }
             }, (error) => {
                 document.getElementById('statusConnection').innerText = "🟡 MODO SIMULAÇÃO ATIVA";
