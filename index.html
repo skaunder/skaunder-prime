@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime | Sistema ASG & Fluxo (WDO/WIN Real-Time)</title>
+    <title>Skaunder Prime | Sistema ASG & Fluxo (Real-Time Sincronizado)</title>
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -180,9 +180,7 @@
         }
         .trade-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
         .btn-buy-act { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); padding: 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .btn-buy-act:hover { background: var(--green); color: #fff; }
         .btn-sell-act { background: rgba(239, 68, 68, 0.2); color: var(--red); border: 1px solid var(--red); padding: 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .btn-sell-act:hover { background: var(--red); color: #fff; }
         .btn-zero { background: var(--red); color: white; border: none; padding: 8px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 6px; font-size: 11px; }
 
         .chart-card {
@@ -251,18 +249,18 @@
     <div class="header">
         <div class="brand">
             <h1>SKAUNDER PRIME <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">| Sistema ASG & Fluxo Real-Time</span></h1>
-            <div id="brandSub" class="brand-sub">🟢 ATIVOS WDO E WIN PADRÃO</div>
+            <div id="brandSub" class="brand-sub">🟢 SINCRONIZADO COM MT5</div>
         </div>
 
         <div class="header-controls">
-            <span class="badge-live" id="statusConnection">🟢 MT5 / FIREBASE CONECTADO</span>
-            <span class="time-display" id="clockDisplay">10:43:22</span>
+            <span class="badge-live" id="statusConnection">🟢 AGUARDANDO DADOS DO MT5...</span>
+            <span class="time-display" id="clockDisplay">--:--:--</span>
         </div>
 
         <div>
             <select id="assetSelect" class="asset-select" onchange="trocarAtivoInstantaneo()">
-                <option value="WDO">WDO (Mini Dólar)</option>
-                <option value="WIN">WIN (Mini Índice)</option>
+                <option value="WDO">WDO / WDOQ (Mini Dólar)</option>
+                <option value="WIN">WIN / WINV (Mini Índice)</option>
             </select>
         </div>
     </div>
@@ -291,24 +289,24 @@
                     <div id="deltaBar" class="delta-bar-fill"></div>
                 </div>
                 <div class="delta-stats">
-                    <span id="buyRatioLabel">BUY 54% / SELL 46%</span>
-                    <span id="deltaVal" style="color: var(--green);">Delta: +103</span>
+                    <span id="buyRatioLabel">BUY 50% / SELL 50%</span>
+                    <span id="deltaVal" style="color: var(--green);">Delta: 0</span>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">Fluxo Acumulado de Players (Acumulado do Dia)</div>
+                <div class="card-title">Fluxo Acumulado de Players (Total do Dia - B3)</div>
                 <div class="player-row">
                     <span>Estrangeiros (HFT)</span>
-                    <span id="valEstrangeiros" class="player-val-buy">+R$ 41.5M</span>
+                    <span id="valEstrangeiros" class="player-val-buy">R$ 0.0M</span>
                 </div>
                 <div class="player-row">
                     <span>Institucionais</span>
-                    <span id="valInstitucional" class="player-val-buy">+R$ 3.2M</span>
+                    <span id="valInstitucional" class="player-val-buy">R$ 0.0M</span>
                 </div>
                 <div class="player-row">
                     <span>Varejo / CPF</span>
-                    <span id="valVarejo" class="player-val-sell">-R$ 44.7M</span>
+                    <span id="valVarejo" class="player-val-sell">R$ 0.0M</span>
                 </div>
             </div>
         </div>
@@ -316,3 +314,333 @@
         <div>
             <div class="card">
                 <div class="card-title">Placar Estatístico Integrado (ASG)</div>
+                <div class="scoreboard">
+                    <div class="score-box-item"><div class="score-box-val" id="scMacro" style="color: var(--green);">1</div><div class="score-box-label">Macro</div></div>
+                    <div class="score-box-item"><div class="score-box-val" id="scMicro" style="color: var(--green);">1</div><div class="score-box-label">Micro</div></div>
+                    <div class="score-box-item"><div class="score-box-val" id="scSup" style="color: var(--green);">1</div><div class="score-box-label">Suporte</div></div>
+                    <div class="score-box-item"><div class="score-box-val" id="scGat" style="color: var(--green);">1</div><div class="score-box-label">Gatilho</div></div>
+                    <div class="score-box-item"><div class="score-box-val" id="scDelta" style="color: var(--green);">1</div><div class="score-box-label">Delta</div></div>
+                </div>
+                <div class="signal-box" id="signalBoxContainer">
+                    <div class="signal-arrow" id="signalArrow">▲</div>
+                    <div class="signal-text" id="signalText">MONITORANDO MT5...</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <span id="chartSymbol">WDO</span>
+                        <span id="chartBadge" class="chart-badge">1m (Candle Nelogica Profit Style)</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted);">
+                        ULT: <b id="chartLastPrice" style="color: #fff;">0.00</b>
+                    </div>
+                </div>
+                
+                <div class="chart-toolbar">
+                    <button class="tb-btn">🕯️ Candles</button>
+                    <button class="tb-btn active">1m Real-Time</button>
+                    <button class="tb-btn">VWAP</button>
+                    <button class="tb-btn" style="margin-left:auto;">🔍 Zoom</button>
+                </div>
+
+                <canvas id="candleChart" width="1000" height="380"></canvas>
+            </div>
+        </div>
+
+        <div>
+            <div class="card">
+                <div class="card-title">Stop Curto & Alvo Longo</div>
+                <div class="metric-row">
+                    <span>Stop Técnico:</span>
+                    <strong style="color: var(--red);" id="stopTecnico">-- Pts</strong>
+                </div>
+                <div class="metric-row">
+                    <span>Parcial Rápida:</span>
+                    <strong style="color: var(--green);" id="parcialRapida">-- Pts (0x0)</strong>
+                </div>
+                <div class="metric-row">
+                    <span>Alvo Final:</span>
+                    <strong style="color: var(--green);" id="alvoFinal">-- Pts</strong>
+                </div>
+                <div class="trade-controls">
+                    <button class="btn-buy-act" onclick="executarOrdemSimulada('COMPRA')">🟢 COMPRAR</button>
+                    <button class="btn-sell-act" onclick="executarOrdemSimulada('VENDA')">🔴 VENDER</button>
+                </div>
+                <button class="btn-zero" onclick="executarOrdemSimulada('ZERAR')">ZERAR POSIÇÃO / EMERGÊNCIA</button>
+            </div>
+
+            <div class="card" style="margin-bottom: 0;">
+                <div class="card-title" id="ttTitle">TIMES & TRADES - WDO</div>
+                <div id="ttStream" class="tt-stream"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tipoAtivoAtual = "WDO";
+        let ultimoTempoFirebase = Date.now();
+
+        const estadosAtivos = {
+            "WDO": {
+                codigo: "WDO",
+                precoBase: 5600.00,
+                historicoCandles: [{ open: 5600, high: 5605, low: 5598, close: 5602, vol: 1000 }],
+                delta: 0, buyRatio: 50, sellRatio: 50, scores: [1, 1, 1, 1, 1],
+                estrangeiros: 0.0, institucional: 0.0, varejo: 0.0,
+                direcao: "COMPRA", veredicto: "AGUARDANDO DADOS", trades: []
+            },
+            "WIN": {
+                codigo: "WIN",
+                precoBase: 128000.00,
+                historicoCandles: [{ open: 128000, high: 128100, low: 127900, close: 128050, vol: 5000 }],
+                delta: 0, buyRatio: 50, sellRatio: 50, scores: [1, 1, 1, 1, 1],
+                estrangeiros: 0.0, institucional: 0.0, varejo: 0.0,
+                direcao: "COMPRA", veredicto: "AGUARDANDO DADOS", trades: []
+            }
+        };
+
+        function trocarAtivoInstantaneo() {
+            tipoAtivoAtual = document.getElementById('assetSelect').value;
+            renderizarAtivoAtual();
+        }
+
+        function renderizarAtivoAtual() {
+            const st = estadosAtivos[tipoAtivoAtual];
+            const isWdo = tipoAtivoAtual.includes('WDO');
+
+            document.getElementById('chartSymbol').innerText = st.codigo;
+            document.getElementById('ttTitle').innerText = `TIMES & TRADES - ${st.codigo}`;
+            document.getElementById('chartLastPrice').innerText = st.precoBase.toFixed(isWdo ? 2 : 0);
+
+            const scoreIds = ['scMacro', 'scMicro', 'scSup', 'scGat', 'scDelta'];
+            st.scores.forEach((val, idx) => {
+                const el = document.getElementById(scoreIds[idx]);
+                if (el) {
+                    el.innerText = val;
+                    el.style.color = val === 1 ? 'var(--green)' : 'var(--red)';
+                }
+            });
+
+            const isComp = st.direcao === "COMPRA";
+            const colorTheme = isComp ? 'var(--green)' : 'var(--yellow)';
+            document.getElementById('signalArrow').innerText = isComp ? "▲" : "■";
+            document.getElementById('signalArrow').style.color = colorTheme;
+            document.getElementById('signalText').innerText = st.veredicto;
+            document.getElementById('signalText').style.color = colorTheme;
+
+            const deltaEl = document.getElementById('deltaVal');
+            deltaEl.innerText = `Delta: ${st.delta > 0 ? '+' : ''}${st.delta}`;
+            deltaEl.style.color = st.delta >= 0 ? 'var(--green)' : 'var(--red)';
+            document.getElementById('buyRatioLabel').innerText = `BUY ${st.buyRatio}% / SELL ${st.sellRatio}%`;
+            document.getElementById('deltaBar').style.width = `${st.buyRatio}%`;
+
+            const atualizarPlayer = (id, val) => {
+                const el = document.getElementById(id);
+                const num = Number(val);
+                el.className = num >= 0 ? 'player-val-buy' : 'player-val-sell';
+                el.innerHTML = `${num >= 0 ? '+' : ''}R$ ${num.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M`;
+            };
+            atualizarPlayer('valEstrangeiros', st.estrangeiros);
+            atualizarPlayer('valInstitucional', st.institucional);
+            atualizarPlayer('valVarejo', st.varejo);
+
+            document.getElementById('stopTecnico').innerText = isWdo ? "4.5 Pts" : "180 Pts";
+            document.getElementById('parcialRapida').innerText = isWdo ? "5.0 Pts (0x0)" : "250 Pts (0x0)";
+            document.getElementById('alvoFinal').innerText = isWdo ? "25.0+ Pts" : "900+ Pts";
+
+            desenharGraficoProfitPro();
+        }
+
+        function executarOrdemSimulada(tipo) {
+            const st = estadosAtivos[tipoAtivoAtual];
+            alert(`Robô Skaunder Prime | Executado: ${tipo} em ${st.codigo} @ ${st.precoBase.toFixed(tipoAtivoAtual.includes('WDO') ? 2 : 0)}`);
+        }
+
+        function desenharGraficoProfitPro() {
+            const canvas = document.getElementById('candleChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const rightPadding = 75;
+            const chartWidth = w - rightPadding;
+            const chartHeight = h - 30;
+
+            ctx.strokeStyle = '#131b2e';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < chartWidth; x += 50) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, chartHeight); ctx.stroke();
+            }
+            for (let y = 0; y < chartHeight; y += 40) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartWidth, y); ctx.stroke();
+            }
+
+            const st = estadosAtivos[tipoAtivoAtual];
+            const candles = st.historicoCandles;
+            if (candles.length === 0) return;
+
+            const candleWidth = chartWidth / candles.length;
+            const bodyWidth = candleWidth * 0.65;
+
+            let minP = Math.min(...candles.map(c => c.low));
+            let maxP = Math.max(...candles.map(c => c.high));
+            if (minP === maxP) { minP -= 1; maxP += 1; }
+            const range = maxP - minP;
+            let maxVol = Math.max(...candles.map(c => c.vol || 100));
+
+            candles.forEach((c, i) => {
+                const x = i * candleWidth + (candleWidth / 2) - (bodyWidth / 2);
+                const xCenter = x + bodyWidth / 2;
+                const isGreen = c.close >= c.open;
+                const color = isGreen ? 'var(--green)' : 'var(--red)';
+
+                const usableHeight = chartHeight * 0.75;
+                const yHigh = usableHeight - ((c.high - minP) / range) * usableHeight;
+                const yLow = usableHeight - ((c.low - minP) / range) * usableHeight;
+                const yOpen = usableHeight - ((c.open - minP) / range) * usableHeight;
+                const yClose = usableHeight - ((c.close - minP) / range) * usableHeight;
+
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(xCenter, yHigh);
+                ctx.lineTo(xCenter, yLow);
+                ctx.stroke();
+
+                ctx.fillStyle = color;
+                const bodyY = Math.min(yOpen, yClose);
+                const bodyH = Math.max(2, Math.abs(yOpen - yClose));
+                ctx.fillRect(x, bodyY, bodyWidth, bodyH);
+
+                const volHeight = ((c.vol || 100) / maxVol) * (chartHeight * 0.20);
+                const volY = chartHeight - volHeight;
+                ctx.fillStyle = isGreen ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)';
+                ctx.fillRect(x, volY, bodyWidth, volHeight);
+            });
+
+            const lastY = chartHeight * 0.75 - ((st.precoBase - minP) / range) * (chartHeight * 0.75);
+            ctx.strokeStyle = '#2962ff';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(0, lastY);
+            ctx.lineTo(chartWidth, lastY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#131b2e';
+            ctx.fillRect(chartWidth, 0, rightPadding, chartHeight);
+            ctx.strokeStyle = '#1e293b';
+            ctx.strokeRect(chartWidth, 0, rightPadding, chartHeight);
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px sans-serif';
+            const steps = 6;
+            for (let s = 0; s <= steps; s++) {
+                const pVal = minP + (range / steps) * (steps - s);
+                const pY = (chartHeight * 0.75 / steps) * s + 10;
+                ctx.fillText(pVal.toFixed(tipoAtivoAtual.includes('WDO') ? 2 : 0), chartWidth + 6, pY);
+            }
+
+            ctx.fillStyle = '#2962ff';
+            ctx.fillRect(chartWidth, lastY - 9, rightPadding, 18);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText(st.precoBase.toFixed(tipoAtivoAtual.includes('WDO') ? 2 : 0), chartWidth + 6, lastY + 4);
+        }
+
+        function processarTickParaAtivo(ativoKey, data) {
+            let chaveBase = ativoKey.toUpperCase().includes('WDO') ? 'WDO' : 'WIN';
+            
+            if (!estadosAtivos[chaveBase]) {
+                estadosAtivos[chaveBase] = {
+                    codigo: ativoKey.toUpperCase(),
+                    precoBase: Number(data.preco || 0),
+                    historicoCandles: [{ open: Number(data.preco || 0), high: Number(data.preco || 0), low: Number(data.preco || 0), close: Number(data.preco || 0), vol: 100 }],
+                    delta: 0, buyRatio: 50, sellRatio: 50, scores: [1,1,1,1,1],
+                    estrangeiros: 0, institucional: 0, varejo: 0, direcao: 'COMPRA', veredicto: 'MT5 CONECTADO', trades: []
+                };
+            }
+
+            const st = estadosAtivos[chaveBase];
+            st.codigo = ativoKey.toUpperCase();
+
+            if (data.preco !== undefined) {
+                st.precoBase = Number(data.preco);
+                if (st.historicoCandles.length > 0) {
+                    let ultimo = st.historicoCandles[st.historicoCandles.length - 1];
+                    ultimo.close = st.precoBase;
+                    if (st.precoBase > ultimo.high) ultimo.high = st.precoBase;
+                    if (st.precoBase < ultimo.low) ultimo.low = st.precoBase;
+                }
+            }
+
+            if (data.delta !== undefined) st.delta = Number(data.delta);
+            if (data.buyRatio !== undefined) st.buyRatio = Number(data.buyRatio);
+            if (data.sellRatio !== undefined) st.sellRatio = Number(data.sellRatio);
+            if (data.estrangeiros !== undefined) st.estrangeiros = Number(data.estrangeiros);
+            if (data.institucional !== undefined) st.institucional = Number(data.institucional);
+            if (data.varejo !== undefined) st.varejo = Number(data.varejo);
+            if (data.veredicto) st.veredicto = data.veredicto;
+            if (data.direcao) st.direcao = data.direcao;
+
+            if (chaveBase === tipoAtivoAtual || ativoKey.toUpperCase() === tipoAtivoAtual) {
+                renderizarAtivoAtual();
+                if (data.hora) {
+                    document.getElementById('clockDisplay').innerText = data.hora;
+                }
+            }
+        }
+
+        function iniciarWatchdogFallback() {
+            setInterval(() => {
+                const tempoSemConexao = Date.now() - ultimoTempoFirebase;
+                if (tempoSemConexao > 3000) {
+                    document.getElementById('statusConnection').innerText = "🟡 MODO SIMULAÇÃO (AGUARDANDO MT5)";
+                    document.getElementById('statusConnection').style.color = "var(--yellow)";
+                } else {
+                    document.getElementById('statusConnection').innerText = "🟢 MT5 CONECTADO EM TEMPO REAL";
+                    document.getElementById('statusConnection').style.color = "var(--green)";
+                }
+            }, 1000);
+        }
+
+        window.onload = () => {
+            renderizarAtivoAtual();
+            iniciarWatchdogFallback();
+        };
+    </script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            databaseURL: "https://skaunder-prime-default-rtdb.firebaseio.com"
+        };
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const database = firebase.database();
+            const cotacaoRef = database.ref('cotacao');
+
+            cotacaoRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    ultimoTempoFirebase = Date.now();
+                    Object.keys(data).forEach(ativoKey => {
+                        processarTickParaAtivo(ativoKey, data[ativoKey]);
+                    });
+                }
+            });
+        } catch (e) {
+            console.error("Erro ao inicializar Firebase:", e);
+        }
+    </script>
+</body>
+</html>
