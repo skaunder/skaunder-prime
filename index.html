@@ -175,10 +175,8 @@
         });
     }
 
-    // Inicializa com o ativo selecionado
     monitorarAtivo(assetSelect.value);
 
-    // Troca de ativo dinamicamente ao mudar no select
     assetSelect.addEventListener('change', (e) => {
         monitorarAtivo(e.target.value);
     });
