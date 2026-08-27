@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime - Advanced Order Flow Dashboard</title>
+    <title>Skaunder Prime - Live Order Flow & Decision Engine</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
@@ -24,16 +24,23 @@
             padding: 20px;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1050px;
             margin: 0 auto;
         }
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        h1 {
+            font-size: 20px;
+            margin: 0;
+            color: #ffffff;
         }
         select {
             background-color: var(--card-bg);
@@ -81,20 +88,57 @@
             color: #8b949e;
             text-transform: uppercase;
         }
-        .panel-section .value {
-            font-size: 20px;
-            font-weight: bold;
+        .trade-signal-box {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            background-color: #11161d;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            text-align: center;
         }
+        .signal-ready { border-color: var(--accent-green); background-color: rgba(35, 134, 54, 0.08); }
+        .signal-wait { border-color: var(--accent-yellow); background-color: rgba(210, 153, 34, 0.08); }
+        .signal-danger { border-color: var(--accent-red); background-color: rgba(218, 54, 51, 0.08); }
+
+        .trade-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .trade-item {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .trade-item span {
+            display: block;
+            font-size: 12px;
+            color: #8b949e;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .trade-item strong {
+            font-size: 16px;
+        }
+
         .compra { color: var(--accent-green); }
         .venda { color: var(--accent-red); }
         .score-high { color: var(--accent-green); }
         .score-mid { color: var(--accent-yellow); }
         .score-low { color: var(--accent-red); }
+        
         .footer-status {
             margin-top: 20px;
             font-size: 12px;
             color: #8b949e;
-            text-align: right;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
     </style>
 </head>
@@ -102,7 +146,7 @@
 
 <div class="container">
     <header>
-        <h2>Skaunder Prime - Order Flow B3 & 5 Filters</h2>
+        <h1>Skaunder Prime &bull; Filtro de Fluxo & Execução B3</h1>
         <div>
             <label for="assetSelect" style="margin-right: 8px; font-weight: bold;">Ativo:</label>
             <select id="assetSelect">
@@ -111,6 +155,32 @@
             </select>
         </div>
     </header>
+
+    <!-- PAINEL DE SINAL DE ENTRADA E SAÍDA -->
+    <div id="tradeSignalBox" class="trade-signal-box signal-wait">
+        <h3 id="signalTitle" style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-yellow);">Analisando Confluência de Mercado...</h3>
+        <div id="signalMainAction" style="font-size: 28px; font-weight: bold; margin: 10px 0;">AGUARDAR FILTROS (< 6 ITENS)</div>
+        <p id="signalDescription" style="margin: 0; font-size: 14px; color: #8b949e;">O sistema exige confluência de região, agressão e resposta do preço para liberar o gatilho.</p>
+        
+        <div class="trade-grid">
+            <div class="trade-item">
+                <span>Direção Recomendada</span>
+                <strong id="trDirecao">NEUTRO</strong>
+            </div>
+            <div class="trade-item">
+                <span>Gatilho Operacional</span>
+                <strong id="trGatilho">Aguardando padrão</strong>
+            </div>
+            <div class="trade-item">
+                <span>Stop Loss (Invalidação)</span>
+                <strong id="trStop">--</strong>
+            </div>
+            <div class="trade-item">
+                <span>Alvo / Espaço</span>
+                <strong id="trAlvo">--</strong>
+            </div>
+        </div>
+    </div>
 
     <div class="grid">
         <div class="card">
@@ -122,30 +192,23 @@
             <div id="delta" class="value">--</div>
         </div>
         <div class="card">
-            <h3>Agressão</h3>
+            <h3>Agressão Dominante</h3>
             <div id="agressao" class="value">--</div>
         </div>
         <div class="card">
-            <h3>Volume Executado</h3>
-            <div id="volume" class="value">--</div>
-        </div>
-    </div>
-
-    <div class="panel-section">
-        <h3>Evento de Fluxo Detectado (Regras 1 a 7)</h3>
-        <div id="eventoFluxo" class="value" style="color: var(--accent-yellow);">Analisando microestrutura em tempo real...</div>
-    </div>
-
-    <div class="panel-section">
-        <h3>Pontuação do Checklist (Sistema de 5 Filtros)</h3>
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <h3>Score (5 Filtros)</h3>
             <div id="score" class="value">-- / 10</div>
-            <div id="recomendacao" style="font-size: 16px; color: #8b949e;">Aguardando leitura estatística...</div>
         </div>
+    </div>
+
+    <div class="panel-section">
+        <h3>Evento de Microestrutura Detectado</h3>
+        <div id="eventoFluxo" class="value" style="color: var(--accent-yellow);">Aguardando ticks do MetaTrader 5...</div>
     </div>
 
     <div class="footer-status">
-        Última atualização: <span id="hora">--:--:--</span> | Status: <span id="statusConn" style="color: #238636;">Conectando...</span>
+        <div>Última atualização: <span id="hora">--:--:--</span></div>
+        <div>Status da Conexão: <span id="statusConn" style="color: var(--accent-yellow);">Conectando...</span></div>
     </div>
 </div>
 
@@ -165,12 +228,83 @@
     const elPreco = document.getElementById('preco');
     const elDelta = document.getElementById('delta');
     const elAgressao = document.getElementById('agressao');
-    const elVolume = document.getElementById('volume');
-    const elEventoFluxo = document.getElementById('eventoFluxo');
     const elScore = document.getElementById('score');
-    const elRecomendacao = document.getElementById('recomendacao');
+    const elEventoFluxo = document.getElementById('eventoFluxo');
     const elHora = document.getElementById('hora');
     const elStatus = document.getElementById('statusConn');
+
+    // Elementos do Painel de Decisão de Entrada/Saída
+    const tradeBox = document.getElementById('tradeSignalBox');
+    const signalTitle = document.getElementById('signalTitle');
+    const signalMainAction = document.getElementById('signalMainAction');
+    const signalDescription = document.getElementById('signalDescription');
+    const trDirecao = document.getElementById('trDirecao');
+    const trGatilho = document.getElementById('trGatilho');
+    const trStop = document.getElementById('trStop');
+    const trAlvo = document.getElementById('trAlvo');
+
+    function processarFiltragemInteligente(data) {
+        let score = data.score || 5;
+        let preco = Number(data.preco) || 0;
+        let delta = Number(data.delta) || 0;
+        let evento = data.eventoFluxo || "";
+
+        // Regra de filtragem baseada no seu sistema de pontuação e 5 filtros:
+        // 8 a 10 itens: Cenário Completo (Gatilho Liberado)
+        // 6 a 7 itens: Intermediário (Monitorar/Cautela)
+        // Abaixo de 6: Melhor não operar (Aguardar)
+
+        if (score >= 8) {
+            tradeBox.className = "trade-signal-box signal-ready";
+            signalTitle.style.color = "var(--accent-green)";
+            signalTitle.innerText = "Gatilho Qualificado (Alta Confluência)";
+            
+            if (delta >= 0 || evento.includes("Comprador") || evento.includes("Absorção de venda") || evento.includes("Rompimento")) {
+                signalMainAction.innerText = "EXECUTAR COMPRA";
+                signalMainAction.className = "value compra";
+                trDirecao.innerText = "COMPRA";
+                trDirecao.className = "compra";
+                trGatilho.innerText = "Romprimento / Reteste Defendido";
+                trStop.innerText = (preco - (preco * 0.0015)).toFixed(2) + " (Atrás do nível/absorção)";
+                trAlvo.innerText = "Próxima região de resistência / VAH";
+            } else {
+                signalMainAction.innerText = "EXECUTAR VENDA";
+                signalMainAction.className = "value venda";
+                trDirecao.innerText = "VENDA";
+                trDirecao.className = "venda";
+                trGatilho.innerText = "Falha de topo / Exaustão confirmada";
+                trStop.innerText = (preco + (preco * 0.0015)).toFixed(2) + " (Atrás do topo/absorção)";
+                trAlvo.innerText = "Próximo suporte / VAL";
+            }
+            signalDescription.innerText = "Filtros atendidos (" + score + "/10). Localização e resposta de fluxo alinhadas. Risco controlado.";
+
+        } else if (score >= 6) {
+            tradeBox.className = "trade-signal-box signal-wait";
+            signalTitle.style.color = "var(--accent-yellow)";
+            signalTitle.innerText = "Cenário Intermediário (Aguardar Confirmação)";
+            signalMainAction.innerText = "MONITORAR MICROESTRUTURA";
+            signalMainAction.className = "value";
+            trDirecao.innerText = "NEUTRO / ATENÇÃO";
+            trDirecao.className = "";
+            trGatilho.innerText = "Aguardando quebra de estrutura";
+            trStop.innerText = "Definido após gatilho";
+            trAlvo.innerText = "Aguardando definição";
+            signalDescription.innerText = "Pontuação intermediária (" + score + "/10). Evite entrar antes da confirmação do reteste.";
+
+        } else {
+            tradeBox.className = "trade-signal-box signal-danger";
+            signalTitle.style.color = "var(--accent-red)";
+            signalTitle.innerText = "Filtros Insuficientes (Fora do Padrão)";
+            signalMainAction.innerText = "NÃO OPERAR";
+            signalMainAction.className = "value venda";
+            trDirecao.innerText = "FORA DO MERCADO";
+            trDirecao.className = "";
+            trGatilho.innerText = "Nenhum gatilho válido";
+            trStop.innerText = "--";
+            trAlvo.innerText = "--";
+            signalDescription.innerText = "Pontuação baixa (" + score + "/10). Risco de ruído ou falta de confluência.";
+        }
+    }
 
     function monitorarAtivo(ativo) {
         if (currentRef) {
@@ -178,6 +312,8 @@
         }
 
         currentRef = db.ref(ativo);
+        elStatus.innerText = "Sincronizando com " + ativo + "...";
+        elStatus.style.color = "var(--accent-yellow)";
         
         currentRef.on('value', (snapshot) => {
             const data = snapshot.val();
@@ -189,33 +325,32 @@
                 elAgressao.innerText = data.agressao;
                 elAgressao.className = "value " + (data.agressao === "COMPRA" ? "compra" : "venda");
                 
-                elVolume.innerText = data.volume;
-                elEventoFluxo.innerText = data.eventoFluxo || "MONITORANDO";
-                
                 let scoreVal = data.score || 0;
                 elScore.innerText = scoreVal + " / 10";
                 elScore.className = "value " + (scoreVal >= 8 ? "score-high" : (scoreVal >= 6 ? "score-mid" : "score-low"));
                 
-                elRecomendacao.innerText = data.recomendacao || "Aguardando critérios";
+                elEventoFluxo.innerText = data.eventoFluxo || "MONITORANDO";
                 elHora.innerText = data.hora || '--:--:--';
-                elStatus.innerText = "Sincronizado em tempo real (" + ativo + ")";
-                elStatus.style.color = "#238636";
+                elStatus.innerText = "Online (" + ativo + " sincronizado)";
+                elStatus.style.color = "var(--accent-green)";
+
+                // Executa a filtragem inteligente e define os momentos de entrada/saída
+                processarFiltragemInteligente(data);
+
             } else {
                 elPreco.innerText = "--";
                 elDelta.innerText = "--";
                 elAgressao.innerText = "--";
-                elVolume.innerText = "--";
-                elEventoFluxo.innerText = "AGUARDANDO DADOS...";
                 elScore.innerText = "-- / 10";
-                elRecomendacao.innerText = "Aguardando feed do robô...";
+                elEventoFluxo.innerText = "AGUARDANDO DADOS DO ROBÔ...";
                 elHora.innerText = "--:--:--";
-                elStatus.innerText = "Aguardando ticks de " + ativo + "...";
-                elStatus.style.color = "#d29922";
+                elStatus.innerText = "Aguardando ticks para " + ativo;
+                elStatus.style.color = "var(--accent-yellow)";
             }
         }, (error) => {
-            console.error("Erro na escuta do Firebase:", error);
+            console.error("Erro no Firebase:", error);
             elStatus.innerText = "Erro de Conexão";
-            elStatus.style.color = "#da3633";
+            elStatus.style.color = "var(--accent-red)";
         });
     }
 
