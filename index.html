@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime - Real-Time Dashboard</title>
-    <!-- Firebase App (core) e Realtime Database (Compat) -->
+    <title>Skaunder Prime - Advanced Order Flow Dashboard</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
@@ -14,6 +13,7 @@
             --text-color: #c9d1d9;
             --accent-green: #238636;
             --accent-red: #da3633;
+            --accent-yellow: #d29922;
             --border-color: #30363d;
         }
         body {
@@ -24,7 +24,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         header {
@@ -48,6 +48,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
+            margin-bottom: 16px;
         }
         .card {
             background-color: var(--card-bg);
@@ -58,16 +59,37 @@
         }
         .card h3 {
             margin: 0 0 10px 0;
-            font-size: 14px;
+            font-size: 13px;
             color: #8b949e;
             text-transform: uppercase;
         }
         .card .value {
-            font-size: 28px;
+            font-size: 26px;
+            font-weight: bold;
+        }
+        .panel-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .panel-section h3 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            color: #8b949e;
+            text-transform: uppercase;
+        }
+        .panel-section .value {
+            font-size: 20px;
             font-weight: bold;
         }
         .compra { color: var(--accent-green); }
         .venda { color: var(--accent-red); }
+        .score-high { color: var(--accent-green); }
+        .score-mid { color: var(--accent-yellow); }
+        .score-low { color: var(--accent-red); }
         .footer-status {
             margin-top: 20px;
             font-size: 12px;
@@ -80,7 +102,7 @@
 
 <div class="container">
     <header>
-        <h2>Skaunder Prime Dashboard</h2>
+        <h2>Skaunder Prime - Order Flow B3 & 5 Filters</h2>
         <div>
             <label for="assetSelect" style="margin-right: 8px; font-weight: bold;">Ativo:</label>
             <select id="assetSelect">
@@ -96,7 +118,7 @@
             <div id="preco" class="value">--</div>
         </div>
         <div class="card">
-            <h3>Delta</h3>
+            <h3>Delta (Saldo)</h3>
             <div id="delta" class="value">--</div>
         </div>
         <div class="card">
@@ -104,8 +126,21 @@
             <div id="agressao" class="value">--</div>
         </div>
         <div class="card">
-            <h3>Volume</h3>
+            <h3>Volume Executado</h3>
             <div id="volume" class="value">--</div>
+        </div>
+    </div>
+
+    <div class="panel-section">
+        <h3>Evento de Fluxo Detectado (Regras 1 a 7)</h3>
+        <div id="eventoFluxo" class="value" style="color: var(--accent-yellow);">Analisando microestrutura em tempo real...</div>
+    </div>
+
+    <div class="panel-section">
+        <h3>Pontuação do Checklist (Sistema de 5 Filtros)</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div id="score" class="value">-- / 10</div>
+            <div id="recomendacao" style="font-size: 16px; color: #8b949e;">Aguardando leitura estatística...</div>
         </div>
     </div>
 
@@ -131,6 +166,9 @@
     const elDelta = document.getElementById('delta');
     const elAgressao = document.getElementById('agressao');
     const elVolume = document.getElementById('volume');
+    const elEventoFluxo = document.getElementById('eventoFluxo');
+    const elScore = document.getElementById('score');
+    const elRecomendacao = document.getElementById('recomendacao');
     const elHora = document.getElementById('hora');
     const elStatus = document.getElementById('statusConn');
 
@@ -139,13 +177,10 @@
             currentRef.off();
         }
 
-        console.log("Iniciando monitoramento para o caminho:", ativo);
         currentRef = db.ref(ativo);
         
         currentRef.on('value', (snapshot) => {
             const data = snapshot.val();
-            console.log("Dados recebidos do Firebase para [" + ativo + "]:", data);
-            
             if (data) {
                 elPreco.innerText = Number(data.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 elDelta.innerText = data.delta;
@@ -155,17 +190,26 @@
                 elAgressao.className = "value " + (data.agressao === "COMPRA" ? "compra" : "venda");
                 
                 elVolume.innerText = data.volume;
+                elEventoFluxo.innerText = data.eventoFluxo || "MONITORANDO";
+                
+                let scoreVal = data.score || 0;
+                elScore.innerText = scoreVal + " / 10";
+                elScore.className = "value " + (scoreVal >= 8 ? "score-high" : (scoreVal >= 6 ? "score-mid" : "score-low"));
+                
+                elRecomendacao.innerText = data.recomendacao || "Aguardando critérios";
                 elHora.innerText = data.hora || '--:--:--';
-                elStatus.innerText = "Sincronizado (" + ativo + ")";
+                elStatus.innerText = "Sincronizado em tempo real (" + ativo + ")";
                 elStatus.style.color = "#238636";
             } else {
-                console.warn("Nenhum dado encontrado no nó:", ativo);
                 elPreco.innerText = "--";
                 elDelta.innerText = "--";
                 elAgressao.innerText = "--";
                 elVolume.innerText = "--";
+                elEventoFluxo.innerText = "AGUARDANDO DADOS...";
+                elScore.innerText = "-- / 10";
+                elRecomendacao.innerText = "Aguardando feed do robô...";
                 elHora.innerText = "--:--:--";
-                elStatus.innerText = "Aguardando dados de " + ativo + "...";
+                elStatus.innerText = "Aguardando ticks de " + ativo + "...";
                 elStatus.style.color = "#d29922";
             }
         }, (error) => {
