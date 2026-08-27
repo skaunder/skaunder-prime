@@ -1,789 +1,209 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaunder Prime | Profit Pro Layout (1m Independent Assets)</title>
+    <title>Painel Robô Fluxo - Estilo ASG & Stop Curto Alvo Longo</title>
     <style>
         :root {
-            --bg-dark: #12161f;
-            --card-bg: #1e222d;
-            --border-color: #2a2e39;
-            --text-main: #d1d4dc;
-            --text-muted: #787b86;
-            --green: #089981;
-            --red: #f23645;
-            --blue: #2962ff;
-            --yellow: #f57c00;
+            --bg-color: #0b0f19;
+            --panel-bg: #131b2e;
+            --border-color: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-buy: #10b981;
+            --accent-sell: #ef4444;
+            --accent-warn: #f59e0b;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 10px;
-            font-size: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
         }
-
-        /* HEADER PROFIT STYLE */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .brand h1 { font-size: 15px; letter-spacing: 0.5px; color: #fff; font-weight: 700; }
-        .brand-sub { font-size: 10px; color: var(--green); font-weight: bold; display: flex; align-items: center; gap: 4px; }
-
-        .header-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .badge-live {
-            background: rgba(8, 153, 129, 0.15);
-            border: 1px solid var(--green);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            color: var(--green);
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .time-display {
-            font-size: 13px;
-            font-weight: bold;
-            color: #fff;
-            background: #131722;
-            padding: 4px 8px;
-            border-radius: 3px;
-            border: 1px solid var(--border-color);
-        }
-
-        .asset-select {
-            background: #131722;
-            color: #fff;
-            border: 1px solid var(--border-color);
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* GRID PRINCIPAL */
-        .dashboard-grid {
+        .container {
             display: grid;
-            grid-template-columns: 340px 1fr;
-            gap: 10px;
+            grid-template-columns: 300px 1fr 320px;
+            gap: 15px;
+            max-width: 1450px;
+            margin: 0 auto;
         }
-
-        .card {
-            background: var(--card-bg);
+        .panel {
+            background-color: var(--panel-bg);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-
-        .card-title {
-            font-size: 10px;
+        h3 {
+            margin-top: 0;
+            font-size: 14px;
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            font-weight: bold;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 4px;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
-        /* PLACAR ESTATÍSTICO */
-        .score-box { text-align: center; padding: 2px 0; }
-        .score-val { font-size: 34px; font-weight: 800; color: #ffb74d; transition: color 0.1s; }
-        .score-max { font-size: 14px; color: var(--text-muted); }
-        .score-status { margin-top: 2px; font-weight: bold; font-size: 11px; color: #ffb74d; }
-
-        /* MICRO CONTEXTO */
-        .delta-bar-container {
-            background: #131722;
-            height: 14px;
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 8px 0;
+        /* Painel Central (ASG Style) */
+        .center-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .scoreboard {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+        .score-box {
+            background: rgba(255,255,255,0.02);
             border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 6px;
         }
-
-        .delta-bar-fill {
-            height: 100%;
-            width: 54%;
-            background: linear-gradient(90deg, var(--red) 0%, var(--green) 100%);
-            transition: width 0.1s ease;
+        .score-value {
+            font-size: 18px;
+            font-weight: bold;
         }
-
-        .delta-stats { display: flex; justify-content: space-between; font-weight: bold; font-size: 10px; }
-
-        /* PLAYERS */
-        .player-row {
+        .signal-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 35px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(19, 27, 46, 0.6));
+            border: 2px solid var(--accent-buy);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .signal-arrow {
+            font-size: 72px;
+            font-weight: bold;
+            color: var(--accent-buy);
+            animation: pulse 1.5s infinite;
+        }
+        .signal-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-buy);
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.06); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        /* Métricas de Tape Reading */
+        .metric-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 11px;
+            margin-bottom: 12px;
+            font-size: 13px;
         }
-        .player-val-buy { color: var(--green); font-weight: bold; }
-        .player-val-sell { color: var(--red); font-weight: bold; }
-
-        .verdict-box {
-            margin-top: 10px;
-            padding: 8px;
-            border-radius: 3px;
-            background: rgba(245, 124, 0, 0.1);
-            border: 1px solid var(--yellow);
-            color: var(--yellow);
-            font-weight: bold;
-            text-align: center;
-            font-size: 10px;
-        }
-
-        /* BOLETAGEM */
-        .trade-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 2px; }
-        .btn-buy-act { background: rgba(8, 153, 129, 0.2); color: var(--green); border: 1px solid var(--green); padding: 8px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .btn-buy-act:hover { background: var(--green); color: #fff; }
-        .btn-sell-act { background: rgba(242, 54, 69, 0.2); color: var(--red); border: 1px solid var(--red); padding: 8px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .btn-sell-act:hover { background: var(--red); color: #fff; }
-
-        /* CHARTS */
-        .chart-card {
-            background: #131722;
-            border: 1px solid var(--border-color);
+        .progress-bar {
+            background: var(--border-color);
+            height: 8px;
             border-radius: 4px;
-            padding: 8px;
-            margin-bottom: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
         }
-
-        .chart-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 6px; 
-            background: var(--card-bg);
-            padding: 6px 10px;
-            border-radius: 3px;
-            border: 1px solid var(--border-color);
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-buy);
+            width: 72%;
         }
-        .chart-title { font-size: 11px; font-weight: bold; color: #fff; display: flex; gap: 8px; align-items: center; }
-        .chart-badge { background: rgba(8, 153, 129, 0.2); color: var(--green); padding: 2px 5px; border-radius: 2px; font-size: 9px; }
-
-        .chart-toolbar {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-            align-items: center;
-        }
-        .tb-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 3px 8px;
-            font-size: 10px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .tb-btn:hover { background: #2a2e39; }
-        .tb-btn.active { border-color: var(--blue); color: var(--blue); font-weight: bold; }
-
-        canvas#candleChart {
+        .btn-control {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px;
             width: 100%;
-            height: 420px;
-            display: block;
-            background: #0b0e14;
-            border-radius: 3px;
-            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
         }
-
-        /* TIMES & TRADES */
-        .tt-stream {
-            height: 160px;
-            overflow-y: auto;
-            background: #0d1117;
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            padding: 4px;
-            font-size: 10px;
-        }
-
-        .tt-row { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #161b22; }
-        .tt-buy { color: var(--green); font-weight: bold; }
-        .tt-sell { color: var(--red); font-weight: bold; }
+        .btn-control:hover { background: #dc2626; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="brand">
-            <h1>SKAUNDER PRIME <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">| Profit Pro Edition</span></h1>
-            <div id="brandSub" class="brand-sub">🟢 TEMPO REAL ATIVO</div>
+<div class="container">
+    <!-- Bloco Esquerdo: Contexto Macro & Micro (Tape Reading) -->
+    <div class="panel">
+        <h3>1. Contexto & Fluxo</h3>
+        <div class="metric-row">
+            <span>Contexto Macro:</span>
+            <strong style="color: var(--accent-buy);">COMPRADOR</strong>
         </div>
-
-        <div class="header-controls">
-            <span class="badge-live" id="statusConnection">🟢 AO VIVO (MT5 / STREAM)</span>
-            <span class="time-display" id="clockDisplay">10:02:20</span>
+        <div class="metric-row">
+            <span>Fluxo Micro:</span>
+            <strong style="color: var(--accent-buy);">AGRESSÃO FORTE</strong>
         </div>
-
-        <div>
-            <select id="assetSelect" class="asset-select" onchange="trocarAtivoInstantaneo()">
-                <option value="WDO" id="optWDO">WDO (Mini Dólar)</option>
-                <option value="WIN" id="optWIN">WIN (Mini Índice)</option>
-            </select>
+        <hr style="border-color: var(--border-color); margin: 15px 0;">
+        <div class="metric-row">
+            <span>Saldo Delta:</span>
+            <strong style="color: var(--accent-buy);">+18.450 Lotes</strong>
         </div>
-    </div>
-
-    <div class="dashboard-grid">
-        <!-- COLUNA ESQUERDA -->
-        <div>
-            <div class="card">
-                <div class="card-title">PLACAR ESTATÍSTICO SKAUNDER</div>
-                <div class="score-box">
-                    <span id="scoreVal" class="score-val">3.4</span><span class="score-max"> / 5.0</span>
-                    <div id="scoreStatus" class="score-status">⚖️ MERCADO EM CONSOLIDAÇÃO</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">MICRO CONTEXTO - AGRESSÃO INSTANTÂNEA</div>
-                <div class="delta-bar-container">
-                    <div id="deltaBar" class="delta-bar-fill"></div>
-                </div>
-                <div class="delta-stats">
-                    <span id="buyRatioLabel">BUY 54% / SELL 46%</span>
-                    <span id="deltaVal" style="color: var(--green);">Delta: +103</span>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">FLUXO ACUMULADO DE PLAYERS</div>
-                <div class="player-row">
-                    <span>Estrangeiros (HFT)</span>
-                    <span id="valEstrangeiros" class="player-val-buy">+R$ 41.5M <small>(COMPRA)</small></span>
-                </div>
-                <div class="player-row">
-                    <span>Institucionais Domésticos</span>
-                    <span id="valInstitucional" class="player-val-buy">+R$ 3.2M <small>(DEFESA)</small></span>
-                </div>
-                <div class="player-row">
-                    <span>Varejo / CPF</span>
-                    <span id="valVarejo" class="player-val-sell">-R$ 44.7M <small>(VENDA)</small></span>
-                </div>
-                <div id="veredictoBox" class="verdict-box">
-                    🟢 PRESSÃO COMPRADORA / ROMPIMENTO IMINENTE
-                </div>
-            </div>
-
-            <div class="card" style="margin-bottom: 0;">
-                <div class="card-title">SIMULADOR DE BOLETAGEM (PRO)</div>
-                <div class="trade-controls">
-                    <button class="btn-buy-act" onclick="executarOrdemSimulada('COMPRA')">🟢 COMPRAR (MERCADO)</button>
-                    <button class="btn-sell-act" onclick="executarOrdemSimulada('VENDA')">🔴 VENDER (MERCADO)</button>
-                </div>
-            </div>
+        <div class="metric-row">
+            <span>Pressão Compradora:</span>
+            <span>72%</span>
         </div>
-
-        <!-- COLUNA DIREITA -->
-        <div>
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div class="chart-title">
-                        <span id="chartSymbol">WDOU26</span>
-                        <span id="chartBadge" class="chart-badge">1m (PRO)</span>
-                    </div>
-                    <div style="font-size: 11px; color: var(--text-muted);">
-                        ULT: <b id="chartLastPrice" style="color: #fff;">5611.12</b>
-                    </div>
-                </div>
-                
-                <div class="chart-toolbar">
-                    <button class="tb-btn">🕯️ Candles</button>
-                    <button class="tb-btn active">1m</button>
-                    <button class="tb-btn">VWAP / Regressão</button>
-                    <button class="tb-btn" style="margin-left:auto;">🔍 Zoom Pro</button>
-                </div>
-
-                <canvas id="candleChart" width="1000" height="420"></canvas>
-            </div>
-
-            <div class="card" style="margin-bottom: 0;">
-                <div class="card-title" id="ttTitle">TIMES & TRADES - AGRESSÕES WDOU26</div>
-                <div id="ttStream" class="tt-stream">
-                    <!-- Stream populado dinamicamente por ativo -->
-                </div>
-            </div>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="metric-row">
+            <span>Defesa de Preço:</span>
+            <span style="color: var(--accent-warn);">Ajustado na VWAP</span>
         </div>
     </div>
 
-    <script>
-        let tipoAtivoAtual = "WDO";
+    <!-- Bloco Central: Placar Estatístico e Seta Direcional (ASG) -->
+    <div class="center-dashboard">
+        <div class="panel">
+            <h3>Placar Estatístico Integrado</h3>
+            <div class="scoreboard">
+                <div class="score-box"><div class="score-value" style="color: var(--accent-buy);">1</div><small>Macro</small></div>
+                <div class="score-box"><div class="score-value" style="color: var(--accent-buy);">1</div><small>Micro</small></div>
+                <div class="score-box"><div class="score-value" style="color: var(--accent-buy);">1</div><small>Suporte</small></div>
+                <div class="score-box"><div class="score-value" style="color: var(--accent-buy);">1</div><small>Gatilho</small></div>
+                <div class="score-box"><div class="score-value" style="color: var(--accent-buy);">1</div><small>Delta</small></div>
+            </div>
+        </div>
 
-        // ESTADOS SEPARADOS E INDEPENDENTES PARA WDO E WIN
-        const estadosAtivos = {
-            "WDO": {
-                codigo: "WDOU26",
-                precoBase: 5611.12,
-                contadorMilisegundosCandle: 0,
-                historicoCandles: [
-                    { open: 5612.00, high: 5614.50, low: 5611.00, close: 5613.00, vol: 1420 },
-                    { open: 5613.00, high: 5613.50, low: 5610.00, close: 5611.00, vol: 980 },
-                    { open: 5611.00, high: 5615.00, low: 5611.00, close: 5614.00, vol: 2300 },
-                    { open: 5614.00, high: 5617.00, low: 5614.00, close: 5616.00, vol: 3100 },
-                    { open: 5616.00, high: 5618.00, low: 5615.00, close: 5617.00, vol: 1850 },
-                    { open: 5617.00, high: 5617.50, low: 5613.00, close: 5614.00, vol: 1200 },
-                    { open: 5614.00, high: 5615.00, low: 5611.00, close: 5612.00, vol: 1650 },
-                    { open: 5612.00, high: 5613.00, low: 5609.00, close: 5610.00, vol: 2100 },
-                    { open: 5610.00, high: 5612.00, low: 5609.50, close: 5611.12, vol: 1950 }
-                ],
-                delta: 103,
-                buyRatio: 54,
-                sellRatio: 46,
-                score: 3.4,
-                scoreStatus: "⚖️ MERCADO EM CONSOLIDAÇÃO",
-                estrangeiros: 41.5,
-                institucional: 3.2,
-                varejo: -44.7,
-                veredicto: "🟢 PRESSÃO COMPRADORA / ROMPIMENTO IMINENTE",
-                trades: [
-                    { player: 'Goldman Sachs', volume: 12, preco: 5611.12, agressao: 'COMPRA' },
-                    { player: 'UBS', volume: 56, preco: 5610.62, agressao: 'VENDA' }
-                ]
-            },
-            "WIN": {
-                codigo: "WINZ26",
-                precoBase: 128500.00,
-                contadorMilisegundosCandle: 0,
-                historicoCandles: [
-                    { open: 128400, high: 128600, low: 128350, close: 128500, vol: 15200 },
-                    { open: 128500, high: 128650, low: 128420, close: 128600, vol: 18400 },
-                    { open: 128600, high: 128800, low: 128550, close: 128720, vol: 24100 },
-                    { open: 128720, high: 128900, low: 128680, close: 128840, vol: 31000 },
-                    { open: 128840, high: 128950, low: 128750, close: 128800, vol: 19500 },
-                    { open: 128800, high: 128850, low: 128600, close: 128650, vol: 14200 },
-                    { open: 128650, high: 128750, low: 128500, close: 128500, vol: 17600 },
-                    { open: 128500, high: 128600, low: 128380, close: 128450, vol: 21000 },
-                    { open: 128450, high: 128580, low: 128400, close: 128500, vol: 16500 }
-                ],
-                delta: -42,
-                buyRatio: 48,
-                sellRatio: 52,
-                score: 2.8,
-                scoreStatus: "⚖️ MERCADO EM CONSOLIDAÇÃO",
-                estrangeiros: 142.5,
-                institucional: -68.2,
-                varejo: -74.3,
-                veredicto: "🟡 ACUMULAÇÃO DE LOTE / AGUARDAR GATILHO",
-                trades: [
-                    { player: 'XP Investimentos', volume: 150, preco: 128500, agressao: 'VENDA' },
-                    { player: 'BTG Pactual', volume: 80, preco: 128520, agressao: 'COMPRA' }
-                ]
-            }
-        };
+        <div class="signal-box">
+            <div class="signal-arrow">▲</div>
+            <div class="signal-text">COMPRA AUTORIZADA</div>
+            <p style="margin: 8px 0 0 0; color: var(--text-muted); font-size: 13px;">Alinhamento estatístico máximo detectado no fluxo.</p>
+        </div>
+    </div>
 
-        function getQuartaMaisProximaDoDia15(ano, mesIndex) {
-            const d15 = new Date(ano, mesIndex, 15);
-            const diaSemana = d15.getDay();
-            let diff = 3 - diaSemana;
-            let diaVenc = 15 + diff;
-            return new Date(ano, mesIndex, diaVenc);
-        }
+    <!-- Bloco Direito: Filosofia Stop Curto & Alvo Longo -->
+    <div class="panel">
+        <h3>Stop Curto & Alvo Longo</h3>
+        <div class="metric-row">
+            <span>Stop Técnico:</span>
+            <strong style="color: var(--accent-sell);">85 Pts (Ajustado)</strong>
+        </div>
+        <div class="metric-row">
+            <span>Parcial Rápida:</span>
+            <strong style="color: var(--accent-buy);">150 Pts (Salva 0x0)</strong>
+        </div>
+        <div class="metric-row">
+            <span>Alvo Final:</span>
+            <strong style="color: var(--accent-buy);">750+ Pts</strong>
+        </div>
+        <hr style="border-color: var(--border-color); margin: 15px 0;">
+        <div class="metric-row">
+            <span>Gestão de Contratos:</span>
+            <span>Escalonado Automático</span>
+        </div>
+        <button class="btn-control">ZERAR POSIÇÃO / EMERGÊNCIA</button>
+    </div>
+</div>
 
-        function obterContratoVigente(ativo) {
-            const hoje = new Date();
-            const hojeClean = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-            let ano = hoje.getFullYear();
-            const letras = ['F', 'G', 'H', 'J', 'K', 'M', 'N', 'Q', 'U', 'V', 'X', 'Z'];
-
-            if (ativo === 'WDO') {
-                let mesVenc = hoje.getMonth() + 1;
-                if (mesVenc > 11) { mesVenc = 0; ano++; }
-                return `WDO${letras[mesVenc]}${ano.toString().slice(-2)}`;
-            }
-
-            if (ativo === 'WIN') {
-                const mesesPares = [1, 3, 5, 7, 9, 11];
-                let contratos = [];
-
-                [ano, ano + 1].forEach(a => {
-                    mesesPares.forEach(m => {
-                        const dataVenc = getQuartaMaisProximaDoDia15(a, m);
-                        contratos.push({
-                            data: dataVenc,
-                            codigo: `WIN${letras[m]}${a.toString().slice(-2)}`
-                        });
-                    });
-                });
-
-                contratos.sort((a, b) => a.data - b.data);
-                let ativoEncontrado = contratos.find(c => {
-                    const vencClean = new Date(c.data.getFullYear(), c.data.getMonth(), c.data.getDate());
-                    return hojeClean <= vencClean;
-                });
-
-                return ativoEncontrado ? ativoEncontrado.codigo : `WINZ${ano.toString().slice(-2)}`;
-            }
-        }
-
-        function atualizarOpcoesSelect() {
-            const contratoWDO = obterContratoVigente('WDO');
-            const contratoWIN = obterContratoVigente('WIN');
-
-            estadosAtivos['WDO'].codigo = contratoWDO;
-            estadosAtivos['WIN'].codigo = contratoWIN;
-
-            const optWDO = document.getElementById('optWDO');
-            optWDO.value = 'WDO';
-            optWDO.innerText = `WDO (${contratoWDO} - Mini Dólar)`;
-
-            const optWIN = document.getElementById('optWIN');
-            optWIN.value = 'WIN';
-            optWIN.innerText = `WIN (${contratoWIN} - Mini Índice)`;
-        }
-
-        function trocarAtivoInstantaneo() {
-            const selectEl = document.getElementById('assetSelect');
-            tipoAtivoAtual = selectEl.value; // 'WDO' ou 'WIN'
-            renderizarAtivoAtual();
-        }
-
-        function renderizarAtivoAtual() {
-            const st = estadosAtivos[tipoAtivoAtual];
-            
-            document.getElementById('chartSymbol').innerText = st.codigo;
-            document.getElementById('ttTitle').innerText = `TIMES & TRADES - AGRESSÕES ${st.codigo}`;
-            document.getElementById('chartLastPrice').innerText = st.precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0);
-
-            // Placar & Indicadores
-            document.getElementById('scoreVal').innerText = Number(st.score).toFixed(1);
-            document.getElementById('scoreVal').style.color = st.score >= 3.2 ? 'var(--green)' : '#ffb74d';
-            document.getElementById('scoreStatus').innerText = st.scoreStatus;
-
-            const deltaEl = document.getElementById('deltaVal');
-            deltaEl.innerText = `Delta: ${st.delta > 0 ? '+' : ''}${st.delta}`;
-            deltaEl.style.color = st.delta >= 0 ? 'var(--green)' : 'var(--red)';
-
-            document.getElementById('buyRatioLabel').innerText = `BUY ${st.buyRatio}% / SELL ${st.sellRatio}%`;
-            document.getElementById('deltaBar').style.width = `${st.buyRatio}%`;
-
-            // Players
-            const est = Number(st.estrangeiros);
-            const elEst = document.getElementById('valEstrangeiros');
-            elEst.className = est >= 0 ? 'player-val-buy' : 'player-val-sell';
-            elEst.innerHTML = `${est >= 0 ? '+' : ''}R$ ${est.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${est >= 0 ? 'COMPRA' : 'VENDA'})</small>`;
-
-            const inst = Number(st.institucional);
-            const elInst = document.getElementById('valInstitucional');
-            elInst.className = inst >= 0 ? 'player-val-buy' : 'player-val-sell';
-            elInst.innerHTML = `${inst >= 0 ? '+' : ''}R$ ${inst.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${inst >= 0 ? 'DEFESA' : 'SAÍDA'})</small>`;
-
-            const varVal = Number(st.varejo);
-            const elVar = document.getElementById('valVarejo');
-            elVar.className = varVal >= 0 ? 'player-val-buy' : 'player-val-sell';
-            elVar.innerHTML = `${varVal >= 0 ? '+' : ''}R$ ${varVal.toLocaleString('pt-BR', {minimumFractionDigits: 1})}M <small>(${varVal >= 0 ? 'COMPRA' : 'VENDA'})</small>`;
-
-            document.getElementById('veredictoBox').innerText = st.veredicto;
-
-            // Times & Trades stream
-            const stream = document.getElementById('ttStream');
-            stream.innerHTML = '';
-            st.trades.forEach(t => {
-                const novaLinha = document.createElement('div');
-                novaLinha.className = 'tt-row';
-                const isBuy = t.agressao === 'COMPRA';
-                novaLinha.innerHTML = `
-                    <span><b>${t.player}</b></span>
-                    <span class="${isBuy ? 'tt-buy' : 'tt-sell'}">
-                        ${t.volume} cont @ ${Number(t.preco).toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0)} (${t.agressao})
-                    </span>
-                `;
-                stream.appendChild(novaLinha);
-            });
-
-            desenharGraficoProfitPro();
-        }
-
-        function executarOrdemSimulada(tipo) {
-            const st = estadosAtivos[tipoAtivoAtual];
-            alert(`Ordem de ${tipo} executada em ${st.codigo} a ${st.precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0)}`);
-        }
-
-        function desenharGraficoProfitPro() {
-            const canvas = document.getElementById('candleChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width;
-            const h = canvas.height;
-
-            ctx.clearRect(0, 0, w, h);
-
-            const rightPadding = 75;
-            const chartWidth = w - rightPadding;
-            const chartHeight = h - 30;
-
-            ctx.strokeStyle = '#161b22';
-            ctx.lineWidth = 1;
-            for(let x = 0; x < chartWidth; x += 50) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, chartHeight); ctx.stroke();
-            }
-            for(let y = 0; y < chartHeight; y += 40) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartWidth, y); ctx.stroke();
-            }
-
-            const st = estadosAtivos[tipoAtivoAtual];
-            const historicoCandles = st.historicoCandles;
-            const count = historicoCandles.length;
-            if (count === 0) return;
-            const candleWidth = chartWidth / count;
-            const bodyWidth = candleWidth * 0.65;
-
-            let minP = Math.min(...historicoCandles.map(c => c.low));
-            let maxP = Math.max(...historicoCandles.map(c => c.high));
-            if (minP === maxP) { minP -= 1; maxP += 1; }
-            const range = maxP - minP;
-
-            let maxVol = Math.max(...historicoCandles.map(c => c.vol || 100));
-
-            historicoCandles.forEach((c, i) => {
-                const x = i * candleWidth + (candleWidth / 2) - (bodyWidth / 2);
-                const xCenter = x + bodyWidth / 2;
-                const isGreen = c.close >= c.open;
-                const color = isGreen ? '#089981' : '#f23645';
-
-                const usableHeight = chartHeight * 0.75;
-                const yHigh = usableHeight - ((c.high - minP) / range) * usableHeight;
-                const yLow = usableHeight - ((c.low - minP) / range) * usableHeight;
-                const yOpen = usableHeight - ((c.open - minP) / range) * usableHeight;
-                const yClose = usableHeight - ((c.close - minP) / range) * usableHeight;
-
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 1.2;
-                ctx.beginPath();
-                ctx.moveTo(xCenter, yHigh);
-                ctx.lineTo(xCenter, yLow);
-                ctx.stroke();
-
-                ctx.fillStyle = color;
-                const bodyY = Math.min(yOpen, yClose);
-                const bodyH = Math.max(2, Math.abs(yOpen - yClose));
-                ctx.fillRect(x, bodyY, bodyWidth, bodyH);
-
-                const volHeight = ((c.vol || 100) / maxVol) * (chartHeight * 0.20);
-                const volY = chartHeight - volHeight;
-                ctx.fillStyle = isGreen ? 'rgba(8, 153, 129, 0.4)' : 'rgba(242, 54, 69, 0.4)';
-                ctx.fillRect(x, volY, bodyWidth, volHeight);
-            });
-
-            const lastY = chartHeight * 0.75 - ((st.precoBase - minP) / range) * (chartHeight * 0.75);
-            ctx.strokeStyle = '#2962ff';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([4, 4]);
-            ctx.beginPath();
-            ctx.moveTo(0, lastY);
-            ctx.lineTo(chartWidth, lastY);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            ctx.fillStyle = '#1e222d';
-            ctx.fillRect(chartWidth, 0, rightPadding, chartHeight);
-            ctx.strokeStyle = '#2a2e39';
-            ctx.strokeRect(chartWidth, 0, rightPadding, chartHeight);
-
-            ctx.fillStyle = '#787b86';
-            ctx.font = '10px sans-serif';
-            const steps = 6;
-            for(let s = 0; s <= steps; s++) {
-                const pVal = minP + (range / steps) * (steps - s);
-                const pY = (chartHeight * 0.75 / steps) * s + 10;
-                ctx.fillText(pVal.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0), chartWidth + 8, pY);
-            }
-
-            ctx.fillStyle = '#2962ff';
-            ctx.fillRect(chartWidth, lastY - 9, rightPadding, 18);
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 11px sans-serif';
-            ctx.fillText(st.precoBase.toFixed(tipoAtivoAtual === 'WDO' ? 2 : 0), chartWidth + 6, lastY + 4);
-        }
-
-        function processarTickParaAtivo(ativoKey, data) {
-            const st = estadosAtivos[ativoKey];
-            if (!st) return;
-
-            if (data.preco !== undefined) {
-                st.precoBase = Number(data.preco);
-                if (st.historicoCandles.length > 0) {
-                    let ultimo = st.historicoCandles[st.historicoCandles.length - 1];
-                    ultimo.close = st.precoBase;
-                    if (st.precoBase > ultimo.high) ultimo.high = st.precoBase;
-                    if (st.precoBase < ultimo.low) ultimo.low = st.precoBase;
-                    ultimo.vol += Math.floor(5 + Math.random() * 25);
-                }
-            }
-
-            if (data.delta !== undefined) st.delta = Number(data.delta);
-            if (data.buyRatio !== undefined) st.buyRatio = Number(data.buyRatio);
-            if (data.sellRatio !== undefined) st.sellRatio = Number(data.sellRatio);
-            if (data.score !== undefined) {
-                st.score = Number(data.score);
-                st.scoreStatus = st.score >= 3.2 ? '🚀 TENDÊNCIA DE ALTA DEFINIDA' : '⚖️ MERCADO EM CONSOLIDAÇÃO';
-            }
-            if (data.estrangeiros !== undefined) st.estrangeiros = Number(data.estrangeiros);
-            if (data.institucional !== undefined) st.institucional = Number(data.institucional);
-            if (data.varejo !== undefined) st.varejo = Number(data.varejo);
-            if (data.veredicto) st.veredicto = data.veredicto;
-
-            if (data.agressao && data.volume) {
-                st.trades.unshift({
-                    player: data.player || 'Corretora B3',
-                    volume: data.volume,
-                    preco: data.preco || st.precoBase,
-                    agressao: data.agressao
-                });
-                if (st.trades.length > 25) st.trades.pop();
-            }
-
-            // Se o ativo que recebeu o dado for o que está atualmente na tela, atualiza a interface imediatamente
-            if (ativoKey === tipoAtivoAtual) {
-                renderizarAtivoAtual();
-                if (data.hora) {
-                    document.getElementById('clockDisplay').innerText = data.hora;
-                }
-            }
-        }
-
-        // SIMULADOR INDEPENDENTE PARA WDO E WIN (RODANDO EM PARALELO)
-        function iniciarTickerDinamico() {
-            let intervaloSimulacao = 200; // 5 atualizações por segundo
-            
-            setInterval(() => {
-                const agora = new Date();
-                document.getElementById('clockDisplay').innerText = agora.toTimeString().split(' ')[0];
-
-                ['WDO', 'WIN'].forEach(ativoKey => {
-                    const st = estadosAtivos[ativoKey];
-                    st.contadorMilisegundosCandle += intervaloSimulacao;
-                    
-                    // Fechamento exato do candle de 1 minuto (60000ms)
-                    if (st.contadorMilisegundosCandle >= 60000) {
-                        st.contadorMilisegundosCandle = 0;
-                        if (st.historicoCandles.length > 30) st.historicoCandles.shift();
-                        let ultimoFechamento = st.historicoCandles[st.historicoCandles.length - 1].close;
-                        st.historicoCandles.push({
-                            open: ultimoFechamento,
-                            high: ultimoFechamento,
-                            low: ultimoFechamento,
-                            close: ultimoFechamento,
-                            vol: Math.floor(100 + Math.random() * 400)
-                        });
-                    }
-
-                    const step = ativoKey === 'WDO' ? 0.25 : 25;
-                    const variacao = (Math.random() - 0.48) * step * 1.5;
-                    st.precoBase += variacao;
-
-                    const deltaSim = Math.floor((Math.random() * 320) - 150);
-                    const buyR = Math.floor(42 + Math.random() * 22);
-                    const sellR = 100 - buyR;
-                    const scoreSim = (2.4 + Math.random() * 2.4).toFixed(1);
-
-                    const playersList = ['Goldman Sachs', 'UBS', 'XP Investimentos', 'Morgan Stanley', 'BTG Pactual', 'Clear Corretora', 'Genial'];
-                    const playerRand = playersList[Math.floor(Math.random() * playersList.length)];
-                    const agrRand = Math.random() > 0.46 ? 'COMPRA' : 'VENDA';
-                    const volRand = Math.floor(5 + Math.random() * 50);
-
-                    const dadosTick = {
-                        preco: st.precoBase,
-                        delta: deltaSim,
-                        buyRatio: buyR,
-                        sellRatio: sellR,
-                        score: scoreSim,
-                        estrangeiros: (Math.random() * 70 - 25).toFixed(1),
-                        institucional: (Math.random() * 20 - 8).toFixed(1),
-                        varejo: (Math.random() * -60 + 15).toFixed(1),
-                        veredicto: Number(scoreSim) >= 3.2 ? '🟢 FLUXO INSTITUCIONAL COMPRADOR' : '🟡 ACUMULAÇÃO DE LOTE / AGUARDAR GATILHO',
-                        player: playerRand,
-                        agressao: agrRand,
-                        volume: volRand
-                    };
-
-                    processarTickParaAtivo(ativoKey, dadosTick);
-                });
-
-            }, intervaloSimulacao);
-        }
-
-        window.onload = () => {
-            atualizarOpcoesSelect();
-            trocarAtivoInstantaneo();
-            iniciarTickerDinamico();
-        };
-    </script>
-
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-    <script>
-        const firebaseConfig = {
-            databaseURL: "https://skaunder-prime-default-rtdb.firebaseio.com"
-        };
-
-        try {
-            firebase.initializeApp(firebaseConfig);
-            const database = firebase.database();
-            
-            // Suporta dados no Firebase separados por nó (ex: /cotacao/WDO e /cotacao/WIN) ou payload contendo propriedade 'ativo'
-            const cotacaoRef = database.ref('cotacao');
-
-            cotacaoRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    document.getElementById('statusConnection').innerText = "🟢 AO VIVO (MT5 CONECTADO)";
-                    
-                    // Se o Firebase enviar estrutura separada por ativo ({WDO: {...}, WIN: {...}})
-                    if (data.WDO || data.WIN) {
-                        if (data.WDO) processarTickParaAtivo('WDO', data.WDO);
-                        if (data.WIN) processarTickParaAtivo('WIN', data.WIN);
-                    } else {
-                        // Se enviar um único objeto informando qual é o ativo (ex: data.ativo = "WDO" ou "WIN")
-                        const targetAtivo = data.ativo || tipoAtivoAtual;
-                        processarTickParaAtivo(targetAtivo, data);
-                    }
-                }
-            }, (error) => {
-                document.getElementById('statusConnection').innerText = "🟡 MODO SIMULAÇÃO ATIVA";
-            });
-        } catch (e) {
-            console.log("Executando em modo de simulação autônoma de alta velocidade.");
-        }
-    </script>
 </body>
 </html>
